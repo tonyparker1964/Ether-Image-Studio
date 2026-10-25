@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ether Image Studio</title>
-<meta name="description" content="Ether Image Studio: explore 42 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
+<meta name="description" content="Ether Image Studio: explore 72 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
 <meta name="theme-color" content="#11101b">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ether Image Studio">
-<meta property="og:description" content="Explore 42 visual styles, blend up to four, and build image and motion prompts.">
+<meta property="og:description" content="Explore 72 visual styles, blend up to four, and build image and motion prompts.">
 <meta property="og:url" content="https://tonyparker1964.github.io/Ether-Image-Studio/">
 <meta property="og:image" content="https://tonyparker1964.github.io/Ether-Image-Studio/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -89,8 +89,8 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 <div class="layout">
 <section class="library" aria-label="Style library">
   <div class="row" role="group" aria-label="Style group">
-    <button type="button" class="tab" id="es-images" aria-pressed="true">30 image styles</button>
-    <button type="button" class="tab" id="es-three" aria-pressed="false">12 3D looks</button>
+    <button type="button" class="tab" id="es-images" aria-pressed="true">51 image styles</button>
+    <button type="button" class="tab" id="es-three" aria-pressed="false">21 3D looks</button>
   </div>
   <label for="es-search">Find a style</label>
   <input id="es-search" type="search" placeholder="Try watercolor, cosmic, clay…" autocomplete="off">
@@ -255,7 +255,37 @@ const STYLE_DATA = [
  ["d9","Voxel Art","Cubic forms, block-built environments, voxel texture",38],
  ["d10","Glass and Crystal 3D","Translucency, refraction, crystalline geometry",39],
  ["d11","Sculpted Metal 3D","Brushed or polished metal, sculpted form, specular light",40],
- ["d12","Architectural Clay Render","Monochrome matte forms, ambient occlusion, architectural volume",41]
+ ["d12","Architectural Clay Render","Monochrome matte forms, ambient occlusion, architectural volume",41],
+ ["i31","Children's Crayon and Colored Pencil","Waxy crayon and colored pencil, visible strokes, joyful hand-drawn color",42],
+ ["i32","Retro Comic Book","Bold inks, halftone dots, flat primary colors, vintage newsprint",43],
+ ["i33","Chibi","Oversized heads, tiny bodies, sparkling eyes, soft rounded shading",44],
+ ["i34","Pop Art","Thick outlines, flat bold color blocks, oversized halftone dots",45],
+ ["i35","Linocut Print","Hand-carved relief lines, gouge marks, two-color ink on paper",46],
+ ["i36","Impressionist Painting","Broken brushstrokes, dappled light, vibrant complementary color",47],
+ ["i37","Tarot Card","Ornate gold border, symbolic composition, rich flat color",48],
+ ["i38","Street Art Mural","Spray-paint fades, drips and stencil edges on a city wall",49],
+ ["i39","Psychedelic '70s Poster","Swirling shapes, flowing contour lines, vibrating color",50],
+ ["i40","Synthwave '80s","Neon rim light, glowing grid horizon, airbrushed gradients",51],
+ ["i41","Blueprint Technical Drawing","White fine-line drafting on blueprint blue, construction lines",52],
+ ["i42","Chalkboard Art","Dusty colored chalk, smudged blending, dark slate board",53],
+ ["i43","Kente and Adinkra Textile","Woven strip patterns in gold, green and red with stamped motifs",54],
+ ["i44","Mosaic Tile","Stone and glass tesserae, grout lines, glinting jewel tones",55],
+ ["i45","Embroidery and Textile","Satin stitch and French knots on linen, raised thread texture",56],
+ ["i46","Persian Miniature","Flat perspective, intricate pattern, lapis blue and gold leaf",57],
+ ["i47","Gongbi Fine-Line Painting","Meticulous ink outlines and delicate layered color on silk",58],
+ ["i48","Polaroid Instant","Soft focus, faded color, light leaks, white instant-film frame",59],
+ ["i49","Double Exposure","Silhouette filled with a second scene, seamless photographic blend",60],
+ ["i50","Tilt-Shift Miniature","Narrow focus band, heavy blur, real scenes that look like models",61],
+ ["i51","Light Painting","Long-exposure light trails swirling around a sharp subject",62],
+ ["d13","Needle Felt","Fuzzy wool fibers, soft rounded forms, handmade miniature set",63],
+ ["d14","Origami 3D","Crisp folded paper, faceted forms, soft cast shadows",64],
+ ["d15","Knitted Yarn","Chunky knit stitches, wool fibers, cozy crocheted world",65],
+ ["d16","Toy Brick Build","Studded plastic bricks, glossy toy figure, macro photography",66],
+ ["d17","Porcelain Figurine","Glossy white porcelain, painted cobalt and gold details",67],
+ ["d18","Wood Carving","Chisel marks, visible grain, warm walnut and oak tones",68],
+ ["d19","Hologram","Translucent light-built figure, scan lines, glowing particles",69],
+ ["d20","Marble Statue","Polished veined marble, carved detail, museum spotlight",70],
+ ["d21","Balloon Inflatable","Twisted balloon shapes, glossy latex, bright playful color",71]
 ];
 const styles = STYLE_DATA.map(([id, name, description, tile]) => ({id, name, description, tile, group: id[0] === 'i' ? 'Image styles' : '3D looks'}));
 const getStyle = id => styles.find(s => s.id === id);
@@ -487,7 +517,14 @@ function tileFor(s, showGroup) {
   b.setAttribute('aria-label', `${s.name}: ${s.description}`);
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
-  t.style.backgroundPosition = `${(s.tile % 6) * 20}% ${Math.floor(s.tile / 6) * 100 / 6}%`;
+  if (s.tile >= 42) {
+    const tile = (s.tile - 42) % 15;
+    t.style.backgroundImage = `url('assets/styles-new-${s.tile < 57 ? 1 : 2}.jpg')`;
+    t.style.backgroundSize = '300% 500%';
+    t.style.backgroundPosition = `${(tile % 3) * 50}% ${Math.floor(tile / 3) * 25}%`;
+  } else {
+    t.style.backgroundPosition = `${(s.tile % 6) * 20}% ${Math.floor(s.tile / 6) * 100 / 6}%`;
+  }
   const l = document.createElement('span'); l.className = 'tile-label'; l.textContent = s.name;
   b.append(t, l);
   if (showGroup) { const g = document.createElement('span'); g.className = 'tile-group'; g.textContent = s.group; b.append(g); }
