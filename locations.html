@@ -9,6 +9,7 @@
 :root{color-scheme:light dark;--page:#ece8f5;--bg:#f6f4fb;--card:#fff;--text:#242038;--sub:#5e5770;--line:#ded7eb;--accent:#6940a8;--on:#fff}
 @media(prefers-color-scheme:dark){:root{--page:#0b0a12;--bg:#11101b;--card:#1c1a2b;--text:#f3efff;--sub:#bdb3d0;--line:#423951;--accent:#d2b3ff;--on:#231235}}
 *{box-sizing:border-box}body{margin:0;padding:24px;background:var(--page);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}main{max-width:1200px;margin:auto;background:var(--bg);padding:32px;border-radius:20px}a{color:var(--accent)}nav{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:32px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--accent)}h1{font-size:clamp(30px,5vw,52px);letter-spacing:-1.5px;line-height:1.1;margin:12px 0}p{color:var(--sub)}button,input{font:inherit}button{color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:12px;min-height:44px;padding:10px 14px;cursor:pointer}button:hover{border-color:var(--accent)}button[aria-pressed=true],.primary{background:var(--accent);color:var(--on);border-color:var(--accent)}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:26px 0 18px}.search{flex:1;min-width:200px}label{display:block;margin-bottom:6px}input{color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%;min-width:0}.categories{display:flex;gap:8px;flex-wrap:wrap}.categories button{font-size:13px}.count{opacity:.75;margin-left:7px}.secondary{margin-top:8px}details{margin:12px 0}summary{cursor:pointer;color:var(--accent);padding:8px 0}.results-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:28px}.results-head h2{font-size:18px;margin:0}.results-head p{font-size:13px;margin:0}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 28px}.place{text-align:left;display:flex;flex-direction:column;gap:4px;justify-content:center;min-height:84px}.place small{font-size:12px;opacity:.75}.selection{position:sticky;bottom:12px;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 6px 24px #0001}.selection p{margin:0;font-size:12px}.selection strong{display:block;font-size:17px;font-weight:500}.use{display:inline-flex;align-items:center;text-decoration:none;border-radius:10px;padding:12px 18px;min-height:44px}.use[aria-disabled=true]{pointer-events:none;opacity:.5}.custom{border-top:1px solid var(--line);padding:22px 0;margin-top:12px}.custom h2{font-size:18px;margin:0 0 12px}.custom-row{display:flex;gap:10px}.custom-row input{flex:1}#empty{padding:24px 0;color:var(--sub)}[hidden]{display:none!important}@media(max-width:760px){body{padding:10px}main{padding:20px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.selection{bottom:8px}}@media(max-width:420px){.grid{grid-template-columns:1fr}.custom-row{flex-direction:column}.selection .use{width:100%;justify-content:center}}
+.place{padding:0;overflow:hidden;justify-content:flex-start;gap:0}.place>span:not(.option-preview){padding:12px 12px 0}.place>small{padding:4px 12px 12px}.place .option-preview{margin:0}
 </style>
 </head>
 <body>
@@ -16,7 +17,7 @@
 <nav aria-label="Studio navigation"><a href="index.html">Image Studio</a><a href="locations.html" aria-current="page">Explore locations</a><a href="anime.html">Japanese Anime</a></nav>
 <div class="eyebrow">ETHER IMAGE STUDIO · LOCATION LIBRARY</div>
 <h1>Where does your story unfold?</h1>
-<p>570 locations. 12 categories. Choose a setting and bring it into your scene.</p>
+<p>570 locations. 12 categories. Choose a setting and bring it into your scene. Each thumbnail is an illustrative scene preview.</p>
 <div class="toolbar"><div class="search"><label for="search">Find a location</label><input id="search" type="search" placeholder="Try neon, temple, rooftop, moon…" autocomplete="off"></div><button type="button" id="surprise">Surprise me</button></div>
 <div id="featured" class="categories" role="group" aria-label="Featured location categories"></div>
 <details id="more"><summary>More categories</summary><div id="other" class="categories secondary" role="group" aria-label="More location categories"></div></details>
@@ -27,6 +28,7 @@
 <div class="selection"><div aria-live="polite"><p>Selected setting</p><strong id="selected">Choose a location</strong><p id="selected-category"></p></div><a id="use" class="use primary" aria-disabled="true">Use in studio →</a></div>
 </main>
 <script src="locations-data.js"></script>
+<script src="thumbnails.js"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -71,9 +73,10 @@
     $('grid').replaceChildren(...places.map(place => {
       const b = document.createElement('button'); b.type='button'; b.className='place';
       b.setAttribute('aria-pressed',String(selected?.name === place.name && selected?.category === place.category));
+      const preview = document.createElement('span'); preview.setAttribute('aria-hidden','true'); decorateThumbnail(preview,'location',place.name);
       const title = document.createElement('span'); title.textContent=place.name;
       const label = document.createElement('small'); label.textContent=place.category;
-      b.append(title,label); b.onclick=()=>choose(place); return b;
+      b.append(preview,title,label); b.onclick=()=>choose(place); return b;
     }));
     $('empty').hidden = !!places.length; selection();
   }

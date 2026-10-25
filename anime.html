@@ -26,6 +26,7 @@
 <div class="selection"><div aria-live="polite"><p>Selected anime look</p><strong id="selected">Choose a look</strong></div><a id="use" class="use primary" aria-disabled="true">Use in studio →</a></div>
 </main>
 <script src="anime-data.js"></script>
+<script src="thumbnails.js"></script>
 <script>
 (() => {
   const $=id=>document.getElementById(id);
@@ -45,12 +46,13 @@
     const looks=pool();$('count').textContent=looks.length+(looks.length===1?' look':' looks');$('empty').hidden=!!looks.length;$('surprise').disabled=!looks.length;
     $('grid').replaceChildren(...looks.map(s=>{
       const card=document.createElement('article');card.className='look'+(selected===s.id?' selected':'');
+      const preview=document.createElement('span');preview.setAttribute('aria-hidden','true');decorateThumbnail(preview,'anime',s.id);
       const tag=document.createElement('span');tag.className='tag';tag.textContent=s.category;
       const h=document.createElement('h2');h.textContent=s.name;const p=document.createElement('p');p.textContent=s.description;
       const actions=document.createElement('div');actions.className='actions';
       const pick=document.createElement('button');pick.type='button';pick.textContent=selected===s.id?'Selected':'Choose look';pick.setAttribute('aria-label','Choose '+s.name);pick.setAttribute('aria-pressed',String(selected===s.id));pick.onclick=()=>choose(s.id);
       const copy=document.createElement('button');copy.type='button';copy.textContent='Copy description';copy.setAttribute('aria-label','Copy '+s.name+' description');copy.onclick=()=>copyStyle(s);
-      actions.append(pick,copy);card.append(tag,h,p,actions);return card;
+      actions.append(pick,copy);card.append(preview,tag,h,p,actions);return card;
     }));
     const current=ANIME_STYLES.find(s=>s.id===selected);$('selected').textContent=current?current.name:'Choose a look';$('use').setAttribute('aria-disabled',String(!current));
     if(current)$('use').href='index.html?'+new URLSearchParams({anime:current.id});else $('use').removeAttribute('href');

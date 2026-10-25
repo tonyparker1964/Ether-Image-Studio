@@ -134,6 +134,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
       </optgroup>
       <option value="custom">Custom character</option>
     </select>
+    <div id="es-character-previews" class="character-previews" role="group" aria-label="Character previews"></div>
     <div id="es-character-options" class="hidden">
       <label for="es-character-look">Character appearance</label>
       <textarea id="es-character-look" style="min-height:70px" placeholder="Describe their age, skin tone, hair, clothing, markings, and personality…"></textarea>
@@ -185,6 +186,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
   </div>
   <input id="es-location-custom" class="hidden" style="margin-top:8px" placeholder="Describe the location, e.g. a quiet front porch on a summer street" aria-label="Custom location">
 
+  <span id="es-location-preview" aria-hidden="true" hidden style="max-width:240px;margin-top:12px"></span>
   <div class="controls">
     <div><label for="es-ratio">Aspect ratio</label><select id="es-ratio"><option>1:1 Square</option><option>16:9 Landscape</option><option>9:16 Portrait</option><option>4:3 Classic</option><option>3:4 Portrait</option><option>3:2 Photo</option><option>2:3 Portrait</option><option>21:9 Cinematic</option></select></div>
     <div><label for="es-shot">Shot size</label><select id="es-shot"><option>Medium shot</option><option>Wide establishing shot</option><option>Full body</option><option>Close-up</option><option>Extreme close-up</option></select></div>
@@ -228,6 +230,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 
 <script src="locations-data.js"></script>
 <script src="anime-data.js"></script>
+<script src="thumbnails.js"></script>
 <script>
 (() => {
 const $ = id => document.getElementById('es-' + id);
@@ -577,8 +580,7 @@ function tileFor(s, showGroup) {
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
   if (s.group === 'Anime looks') {
-    t.classList.add('thumb-anime');
-    t.textContent = s.name;
+    decorateThumbnail(t, 'anime', s.id);
   } else if (s.tile >= 42) {
     const tile = (s.tile - 42) % 15;
     t.style.backgroundImage = `url('assets/styles-new-${s.tile < 57 ? 1 : 2}.jpg')`;
@@ -638,6 +640,23 @@ function renderTotal() {
   $('total').className = 'total ' + (ok ? 'good' : 'bad');
 }
 function renderCharacters() {
+  const grid = $('character-previews');
+  if (grid.dataset.selected !== $('character').value || !grid.children.length) {
+  grid.dataset.selected = $('character').value;
+  grid.replaceChildren(...Object.entries(CHARACTER_PRESETS).map(([key,preset]) => {
+    const b = document.createElement('button'); b.type='button'; b.className='character-choice';
+    b.setAttribute('aria-label', 'Choose '+preset.name); b.setAttribute('aria-pressed', String($('character').value===key));
+    const image=document.createElement('span'); image.setAttribute('aria-hidden','true'); decorateThumbnail(image,'character',key);
+    const label=document.createElement('span'); label.textContent=preset.name; b.append(image,label);
+    b.onclick=()=>{ $('character').value=key; $('character').dispatchEvent(new Event('change',{bubbles:true})); };
+    return b;
+  }));
+  }
+  const placePreview = $('location-preview'), placeName = location();
+  placePreview.hidden = !THUMBNAILS.location[placeName];
+  if (!placePreview.hidden && placePreview.dataset.place !== placeName) {
+    placePreview.dataset.place = placeName; decorateThumbnail(placePreview, 'location', placeName);
+  }
   $('character-options').classList.toggle('hidden', !$('character').value);
   $('ether-ref-wrap').classList.toggle('hidden', !$('ether').checked);
   $('element-opts').classList.toggle('hidden', !$('element').checked);
