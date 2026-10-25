@@ -82,7 +82,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 </head>
 <body>
 <main id="ether-studio">
-<div class="eyebrow">ETHER IMAGE STUDIO · 2.1</div>
+<div class="eyebrow">ETHER IMAGE STUDIO · 2.2</div>
 <h1>Imagine beyond the ordinary.</h1>
 <p>Choose a look. Blend your influences. Bring Ether and Element into the scene, then take it from still to motion.</p>
 
@@ -147,6 +147,25 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 
   <label for="es-scene">Describe your scene</label>
   <textarea id="es-scene" placeholder="Ether and Element discover a garden of luminous crystals at dusk…"></textarea>
+
+  <label for="es-location">Location</label>
+  <select id="es-location">
+    <option value="">None (use the scene description)</option>
+    <optgroup label="Nature">
+      <option>City park</option><option>Enchanted forest</option><option>Rainforest jungle</option><option>Sandy beach</option><option>Mountain peak</option><option>Desert dunes</option><option>Snowy field</option><option>Riverbank</option><option>Wildflower meadow</option><option>Waterfall</option><option>Cave</option><option>Savanna</option><option>Coral reef underwater</option>
+    </optgroup>
+    <optgroup label="City and neighborhood">
+      <option>Busy city street</option><option>Rooftop overlooking the city</option><option>Backyard</option><option>Playground</option><option>Basketball court</option><option>Skate park</option><option>Train station</option><option>Open-air market</option><option>Subway car</option>
+    </optgroup>
+    <optgroup label="Indoors">
+      <option>Bedroom</option><option>Kitchen</option><option>Living room</option><option>Classroom</option><option>Library</option><option>Museum hall</option><option>Art studio</option><option>Recording studio</option><option>Theater stage</option>
+    </optgroup>
+    <optgroup label="Fantasy and sci-fi">
+      <option>Moonlit garden with stone arches</option><option>Floating islands</option><option>Ancient temple ruins</option><option>Castle courtyard</option><option>Crystal cave</option><option>Cloud kingdom</option><option>Underwater city</option><option>Alien planet</option><option>Space station</option><option>Futuristic city</option>
+    </optgroup>
+    <option value="custom">Custom location…</option>
+  </select>
+  <input id="es-location-custom" class="hidden" style="margin-top:8px" placeholder="Describe the location, e.g. a quiet front porch on a summer street" aria-label="Custom location">
 
   <div class="controls">
     <div><label for="es-ratio">Aspect ratio</label><select id="es-ratio"><option>1:1 Square</option><option>16:9 Landscape</option><option>9:16 Portrait</option><option>4:3 Classic</option><option>3:4 Portrait</option><option>3:2 Photo</option><option>2:3 Portrait</option><option>21:9 Cinematic</option></select></div>
@@ -253,7 +272,7 @@ const STARTER = {
   }
 };
 const DEFAULTS = {1: [100], 2: [60, 40], 3: [50, 30, 20], 4: [40, 30, 20, 10]};
-const FIELDS = ['mode','scene','ratio','shot','angle','lens','light','film','motion','target','exclude',
+const FIELDS = ['mode','scene','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
   'form','ether-look','element-look','cue-earth','cue-water','cue-fire','cue-air','vtool','duration','cam','pace','action'];
 const CHECKS = ['ether','ether-ref','element','element-ref'];
 
@@ -341,6 +360,10 @@ function elementForm() {
   }
   return 'in their ' + clean($('cue-' + f).value);
 }
+function location() {
+  const v = $('location').value;
+  return v === 'custom' ? clean($('location-custom').value) : v;
+}
 function characters() {
   const list = [];
   if ($('ether').checked) list.push({name: 'Ether', text: clean($('ether-look').value) || 'Ether', ref: $('ether-ref').checked});
@@ -380,6 +403,7 @@ function userExcludes() { return $('exclude').value.split(/[,;\n]/).map(clean).f
 
 function chatPrompt() {
   const s = selected.map(getStyle), lines = ['Create one finished still image.', '', 'Scene: ' + clean($('scene').value) + '.'];
+  if (location()) lines.push('Location: ' + location() + '.');
   const chars = characters();
   if (chars.length) {
     lines.push('Characters:');
@@ -403,6 +427,7 @@ function chatPrompt() {
 
 function mjPrompt() {
   const s = selected.map(getStyle), parts = [clean($('scene').value)];
+  if (location()) parts.push($('location').value === 'custom' ? 'set at ' + location() : 'in a ' + lower1(location()));
   characters().forEach(c => parts.push(clean(c.text)));
   if (s.length === 1) parts.push(`${s[0].name.toLowerCase()} style, ${lower1(s[0].description)}`);
   else if (s.length > 1) {
@@ -431,6 +456,7 @@ function motionPrompt() {
   const lines = [];
   lines.push(`Image-to-video: use the generated still as the first frame. ${$('duration').value}, ${ratioOf()}, one continuous shot.`);
   lines.push('', `Scene: ${clean($('scene').value)}.`);
+  if (location()) lines.push(`Location: ${location()}.`);
   lines.push(`Action: ${action}.`);
   if ($('motion').value !== 'Still and composed' && $('action').value.trim()) lines.push(`Environment: ${lower1(ACTION_FROM_MOTION[$('motion').value].split(' while ')[0])}.`);
   lines.push(`${tool === 'higgsfield' ? 'Camera motion preset' : 'Camera'}: ${$('cam').value.toLowerCase()}; keep the ${lower1($('shot').value)} framing and ${$('lens').value} lens feel.`);
@@ -516,6 +542,7 @@ function renderCharacters() {
   $('element-opts').classList.toggle('hidden', !$('element').checked);
   $('blend').classList.toggle('hidden', $('form').value !== 'blend');
   $('mj-note').classList.toggle('hidden', $('target').value !== 'mj');
+  $('location-custom').classList.toggle('hidden', $('location').value !== 'custom');
 }
 function renderOutputs() {
   const err = problem();
