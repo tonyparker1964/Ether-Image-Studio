@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ether Image Studio</title>
 <meta name="description" content="Ether Image Studio: explore 130 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
-<meta name="theme-color" content="#11101b">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ether Image Studio">
 <meta property="og:description" content="Explore 130 visual styles, blend up to four, and build image and motion prompts.">
@@ -19,96 +20,204 @@
 <style>
 :root{
   color-scheme:light dark;
-  --es-page:#ece8f5;--es-bg:#f6f4fb;--es-card:#fff;--es-text:#242038;--es-sub:#5e5770;--es-line:#ded7eb;
-  --es-accent:#6940a8;--es-on-accent:#fff;--es-warn:#b3261e;--es-ok:#2e7d4f;
+  --es-page:#f5f5f7;--es-bg:#f5f5f7;--es-card:#ffffff;--es-field:#f5f5f7;--es-text:#1d1d1f;--es-sub:#6e6e73;--es-line:#d2d2d7;
+  --es-accent:#0071e3;--es-accent-hover:#0077ed;--es-on-accent:#fff;--es-warn:#d70015;--es-ok:#248a3d;
+  --es-glass:rgba(251,251,253,.78);--es-shadow:0 2px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06);
+  --es-grad:linear-gradient(100deg,#7b3fe4 0%,#0071e3 45%,#e0508f 100%);
+  --es-radius:22px;
 }
 @media (prefers-color-scheme:dark){:root{
-  --es-page:#0b0a12;--es-bg:#11101b;--es-card:#1c1a2b;--es-text:#f3efff;--es-sub:#bdb3d0;--es-line:#423951;
-  --es-accent:#d2b3ff;--es-on-accent:#231235;--es-warn:#ffb4ab;--es-ok:#8fd6a8;
+  --es-page:#000;--es-bg:#000;--es-card:#1c1c1e;--es-field:#2c2c2e;--es-text:#f5f5f7;--es-sub:#a1a1a6;--es-line:#38383a;
+  --es-accent:#2997ff;--es-accent-hover:#47a5ff;--es-on-accent:#fff;--es-warn:#ff6961;--es-ok:#30d158;
+  --es-glass:rgba(22,22,23,.72);--es-shadow:0 0 0 1px rgba(255,255,255,.04);
+  --es-grad:linear-gradient(100deg,#b388ff 0%,#2997ff 45%,#ff7eb3 100%);
 }}
 *{box-sizing:border-box}
-body{margin:0;padding:20px;background:var(--es-page);color:var(--es-text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:1400px;margin:auto;background:var(--es-bg);border-radius:20px;padding:24px}
-h1{font-size:30px;letter-spacing:-1px;margin:2px 0 6px;line-height:1.15}
-h2{font-size:18px;margin:22px 0 8px}
-h3{font-size:15px;margin:0 0 6px}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--es-page);color:var(--es-text);font:17px/1.47 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+a{color:var(--es-accent);text-decoration:none}a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit;color:var(--es-text);letter-spacing:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid color-mix(in srgb,var(--es-accent) 55%,transparent);outline-offset:2px}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:50;background:var(--es-glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid color-mix(in srgb,var(--es-line) 60%,transparent)}
+.topbar-in{max-width:1280px;margin:auto;height:52px;display:flex;align-items:center;gap:24px;padding:0 22px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px;color:var(--es-text);white-space:nowrap}
+.brand:hover{text-decoration:none}
+.brand svg{width:22px;height:22px}
+.topnav{display:flex;gap:22px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.topnav::-webkit-scrollbar{display:none}
+.topnav a{color:var(--es-sub);font-size:13px;white-space:nowrap;padding:4px 0}
+.topnav a:hover{color:var(--es-text);text-decoration:none}
+.topnav a[aria-current]{color:var(--es-text)}
+
+/* hero */
+.hero{text-align:center;padding:72px 22px 40px;max-width:900px;margin:auto}
+.eyebrow{font-size:14px;font-weight:600;color:var(--es-sub);letter-spacing:.02em;margin-bottom:10px}
+h1{font-size:clamp(40px,7vw,80px);line-height:1.04;letter-spacing:-.035em;font-weight:700;margin:0 0 18px;background:var(--es-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(19px,2.2vw,24px);line-height:1.35;color:var(--es-sub);margin:0 auto 28px;max-width:680px;font-weight:400}
+.steps{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.steps a{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:980px;background:var(--es-card);color:var(--es-text);font-size:14px;box-shadow:var(--es-shadow)}
+.steps a:hover{text-decoration:none;background:var(--es-field)}
+.steps b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--es-text);color:var(--es-page);font-size:11px}
+
+/* layout */
+main{max-width:1280px;margin:auto;padding:0 22px 140px}
+.layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,1fr);gap:24px;align-items:start}
+.card{background:var(--es-card);border-radius:var(--es-radius);padding:28px;box-shadow:var(--es-shadow)}
+.stack{display:grid;gap:24px;min-width:0}
+.layout>*{min-width:0}
+.library{position:sticky;top:72px}
+.card-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
+.num{font-size:14px;font-weight:600;color:var(--es-accent);font-variant-numeric:tabular-nums}
+h2{font-size:28px;line-height:1.14;letter-spacing:-.02em;font-weight:700;margin:0}
+h3{font-size:17px;font-weight:600;margin:22px 0 4px}
 p{margin:6px 0 14px;color:var(--es-sub)}
-a{color:var(--es-accent)}
-.eyebrow{color:var(--es-accent);letter-spacing:2px;font-size:12px;font-weight:600}
-.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);gap:28px;align-items:start}
-.library{position:sticky;top:12px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-height:calc(100vh - 230px);overflow:auto;padding:3px}
-button,input,select,textarea{font:inherit;color:var(--es-text)}
-button{background:var(--es-card);border:1px solid var(--es-line);border-radius:10px;padding:9px 12px;min-height:44px;cursor:pointer}
-button:hover{border-color:var(--es-accent)}
-button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--es-accent);outline-offset:2px}
-.tab[aria-pressed=true]{background:var(--es-accent);color:var(--es-on-accent);border-color:var(--es-accent)}
-.tile{position:relative;padding:0;text-align:left;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;outline:3px solid transparent;outline-offset:-3px}
-.tile[aria-pressed=true]{outline-color:var(--es-accent)}
-.tile[aria-pressed=true]::after{content:"✓";position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:var(--es-accent);color:var(--es-on-accent);display:grid;place-items:center;font-size:13px;font-weight:700}
-.thumb{display:block;aspect-ratio:1;background:var(--es-line) url('assets/styles.webp') no-repeat;background-size:600% 700%}
+.note{font-size:13px;line-height:1.45;color:var(--es-sub)}
+
+/* segmented tabs */
+.seg{display:flex;gap:2px;padding:3px;border-radius:12px;background:var(--es-field);overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;border:0;background:transparent;border-radius:9px;padding:7px 14px;font-size:14px;color:var(--es-text);cursor:pointer;white-space:nowrap;transition:background .2s,box-shadow .2s}
+.tab small{color:var(--es-sub);font-size:12px;margin-left:3px}
+.tab[aria-pressed=true]{background:var(--es-card);box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:600}
+@media (prefers-color-scheme:dark){.tab[aria-pressed=true]{background:#636366}.tab[aria-pressed=true] small{color:#e5e5ea}}
+.lib-tools{display:flex;gap:10px;align-items:center;margin:14px 0 6px}
+.lib-tools input{flex:1;min-width:0}
+.lib-tools .chip{flex:none}
+.search{padding-left:38px;background:var(--es-field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5.5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E") no-repeat 14px center}
+
+/* tiles */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-height:calc(100vh - 290px);overflow:auto;padding:4px;margin:0 -4px;scrollbar-width:thin}
+.tile{position:relative;padding:0;text-align:left;overflow:hidden;display:flex;flex-direction:column;background:transparent;border:0;border-radius:16px;cursor:pointer}
+.tile .thumb{border-radius:16px;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.tile:hover .thumb{transform:scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.tile[aria-pressed=true] .thumb{box-shadow:0 0 0 3px var(--es-card),0 0 0 6px var(--es-accent)}
+.tile[aria-pressed=true]::after{content:"✓";position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--es-accent);color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.thumb{display:block;aspect-ratio:1;background:var(--es-field) url('assets/styles.webp') no-repeat;background-size:600% 700%}
 .thumb-anime{background:none;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;color:var(--es-accent);font-size:14px;line-height:1.4}
-.tile-label{display:block;padding:7px 8px;font-size:12px;line-height:1.3}
-.tile-group{display:block;padding:0 8px 7px;font-size:11px;color:var(--es-sub)}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-label{display:block;margin:12px 0 4px;font-size:14px}
-input,select,textarea{width:100%;background:var(--es-card);border:1px solid var(--es-line);padding:10px;border-radius:9px;min-width:0}
-input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:var(--es-accent);flex:none}
-textarea{min-height:110px;resize:vertical}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-.panel{background:var(--es-card);border:1px solid var(--es-line);border-radius:14px;padding:14px;margin:12px 0}
-.panel label{margin-top:10px}
-.panel input,.panel select,.panel textarea{background:var(--es-bg)}
-.check{display:flex;gap:10px;align-items:center;margin:8px 0;font-size:14px;cursor:pointer}
-.sub-check{margin-left:30px;font-size:13px;color:var(--es-sub)}
-.primary{background:var(--es-accent);color:var(--es-on-accent);border:0;font-weight:600}
-.note{font-size:12px;color:var(--es-sub)}
-.status{min-height:22px;color:var(--es-accent);font-size:14px;margin:8px 0}
-.chip{font-size:12px;min-height:36px;padding:6px 10px}
-.weights{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.weight{flex:1;min-width:110px;margin:0;font-size:12px}
-.weight input{margin-top:3px;padding:8px}
-.total{font-size:13px;font-weight:600}
+.tile-label{display:block;padding:9px 2px 0;font-size:13px;line-height:1.3;font-weight:500}
+.tile-group{display:block;padding:2px 2px 0;font-size:12px;color:var(--es-sub)}
+
+/* form controls */
+label{display:block;margin:16px 0 6px;font-size:14px;font-weight:500}
+input,select,textarea{width:100%;background:var(--es-field);border:1px solid transparent;padding:12px 14px;border-radius:12px;min-width:0;transition:border-color .2s,background .2s}
+input:hover,select:hover,textarea:hover{border-color:var(--es-line)}
+input:focus,select:focus,textarea:focus{background:var(--es-card);border-color:var(--es-accent)}
+select{appearance:none;-webkit-appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%238e8e93' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:0;padding:0;border-radius:50%;border:1.5px solid var(--es-line);background:var(--es-card);flex:none;display:grid;place-items:center;cursor:pointer}
+input[type=checkbox]:checked{background:var(--es-accent);border-color:var(--es-accent)}
+input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+textarea{min-height:110px;resize:vertical;line-height:1.5}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+.check{display:flex;gap:12px;align-items:center;margin:12px 0;font-size:15px;font-weight:400;cursor:pointer}
+.sub-check{margin-left:34px;font-size:14px;color:var(--es-sub)}
+.panel{background:var(--es-field);border-radius:16px;padding:16px 18px;margin:14px 0}
+.panel input,.panel select,.panel textarea{background:var(--es-card)}
+.panel label:first-child{margin-top:0}
+.divider{height:1px;background:var(--es-line);margin:22px 0;opacity:.7}
+
+/* buttons */
+button{background:var(--es-field);border:0;border-radius:980px;padding:10px 18px;min-height:44px;cursor:pointer;font-size:15px;transition:background .2s,transform .1s}
+button:hover{background:color-mix(in srgb,var(--es-field) 80%,var(--es-text))}
+button:active{transform:scale(.98)}
+.primary{background:var(--es-accent);color:var(--es-on-accent);font-weight:500}
+.primary:hover{background:var(--es-accent-hover)}
+.chip{font-size:14px;min-height:36px;padding:7px 15px}
+.chip.ghost{background:transparent;color:var(--es-accent);padding-left:0;padding-right:0}
+.chip.ghost:hover{text-decoration:underline;background:transparent}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* style selection */
+#es-selected .chip{background:var(--es-card);box-shadow:inset 0 0 0 1px var(--es-line)}
+.weights{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.weight{flex:1;min-width:110px;margin:0;font-size:12px;color:var(--es-sub);font-weight:500}
+.weight input{margin-top:5px;padding:9px 12px}
+.total{font-size:14px;font-weight:600}
 .total.bad{color:var(--es-warn)}.total.good{color:var(--es-ok)}
-details>summary{cursor:pointer;color:var(--es-accent);font-size:14px;margin-top:10px}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border:1px solid var(--es-line);padding:12px;border-radius:10px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0;max-height:420px;overflow:auto}
-.out-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px}
-.out-head h2{margin:0}
-.empty{color:var(--es-sub);font-size:13px;padding:10px;grid-column:1/-1}
+details>summary{cursor:pointer;color:var(--es-accent);font-size:15px;margin-top:14px;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:" ›";display:inline-block;transition:transform .2s}
+details[open]>summary::after{transform:rotate(90deg)}
+
+/* output */
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);border:0;padding:18px;border-radius:16px;font:13px/1.6 ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;margin:14px 0 0;max-height:440px;overflow:auto;color:var(--es-text)}
+.status{min-height:22px;color:var(--es-ok);font-size:14px;margin:10px 0 0;font-weight:500}
+.empty{color:var(--es-sub);font-size:14px;padding:20px 4px;grid-column:1/-1}
 .hidden{display:none!important}
-.loc-row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr) auto;gap:8px}
-@media(max-width:600px){.loc-row{grid-template-columns:1fr 1fr}.loc-row select#es-location{grid-column:1/-1;grid-row:1}}
-.mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
-@media(max-width:900px){.layout{grid-template-columns:1fr}.library{position:static}.grid{max-height:none}}
-@media(max-width:600px){body{padding:8px}main{padding:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.loc-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+.loc-row #es-location{grid-column:1/-1;grid-row:2}
+.footnote{text-align:center;font-size:12px;color:var(--es-sub);margin:48px auto 0;max-width:600px}
+
+/* character preview cards */
+.character-previews{gap:12px!important;margin-top:16px!important}
+.character-choice{border-radius:16px!important;background:var(--es-card)!important;padding:0!important;min-height:0;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px var(--es-line);transition:transform .25s,box-shadow .25s}
+.character-choice:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 1px var(--es-line),0 8px 20px rgba(0,0,0,.12)}
+.character-choice span:first-child{border-radius:16px 16px 0 0}
+.character-choice span:last-child{padding:9px 10px!important;font-size:13px!important;font-weight:500;color:var(--es-text)}
+.character-choice[aria-pressed=true]{outline:none!important;box-shadow:0 0 0 3px var(--es-accent)!important}
+#es-location-preview{display:block}
+#es-character-options label:first-child{margin-top:18px}
+
+/* floating copy dock */
+.dock{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:60;display:flex;gap:8px;align-items:center;padding:8px;border-radius:980px;background:var(--es-glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.18),inset 0 0 0 1px color-mix(in srgb,var(--es-line) 60%,transparent);max-width:calc(100vw - 24px)}
+.dock button{white-space:nowrap}
+.dock .dock-status{font-size:13px;color:var(--es-sub);padding:0 10px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media(max-width:980px){.layout{grid-template-columns:1fr}.library{position:static}.grid{max-height:560px}}
+@media(max-width:600px){
+  .hero{padding:44px 16px 28px}main{padding:0 12px 130px}.card{padding:20px;border-radius:18px}
+  .topbar-in{padding:0 14px;gap:14px}.brand span{display:none}
+  h2{font-size:24px}.dock .dock-status{display:none}.dock button{padding:10px 14px;font-size:14px}
+}
 @media(max-width:380px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.controls,.mini{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<main id="ether-studio">
-<nav class="row" aria-label="Studio navigation" style="margin-bottom:18px"><a href="index.html" aria-current="page">Image Studio</a><a href="locations.html">Explore locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
-<div class="eyebrow">ETHER IMAGE STUDIO · 2.6</div>
-<h1>Imagine beyond the ordinary.</h1>
-<p>Choose a look. Blend your influences. Bring Ether and Element into the scene, then take it from still to motion.</p>
-
-<div class="layout">
-<section class="library" aria-label="Style library">
-  <div class="row" role="group" aria-label="Style group">
-    <button type="button" class="tab" id="es-images" aria-pressed="true">51 image styles</button>
-    <button type="button" class="tab" id="es-three" aria-pressed="false">21 3D looks</button>
-    <button type="button" class="tab" id="es-anime" aria-pressed="false">33 anime looks</button>
-    <button type="button" class="tab" id="es-donghua" aria-pressed="false">10 donghua &amp; fusion looks</button>
-    <button type="button" class="tab" id="es-world" aria-pressed="false">15 world styles</button>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Ether Image Studio home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="eg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b3fe4"/><stop offset=".5" stop-color="#0071e3"/><stop offset="1" stop-color="#e0508f"/></linearGradient></defs><path d="M32 4c2.6 16.4 11.6 25.4 28 28-16.4 2.6-25.4 11.6-28 28C29.4 43.6 20.4 34.6 4 32c16.4-2.6 25.4-11.6 28-28z" fill="url(#eg)"/></svg>
+      <span>Ether Image Studio</span>
+    </a>
+    <nav class="topnav" aria-label="Studio navigation"><a href="index.html" aria-current="page">Studio</a><a href="locations.html">Locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
   </div>
-  <button type="button" id="es-surprise-blend" class="chip" style="margin-top:8px">🌍 Surprise world blend</button>
-  <label for="es-search">Find a style</label>
-  <input id="es-search" type="search" placeholder="Try watercolor, cosmic, clay…" autocomplete="off">
-  <p class="note">Tap thumbnails to select. Search covers all groups. Examples are illustrative.</p>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">Ether Image Studio 2.7</div>
+  <h1>Imagine beyond<br>the ordinary.</h1>
+  <p class="lede">130 looks from around the world. Blend up to four, cast anyone, and turn one idea into an image and motion prompt.</p>
+  <nav class="steps" aria-label="Steps">
+    <a href="#step-look"><b>1</b>Look</a><a href="#step-blend"><b>2</b>Blend</a><a href="#step-cast"><b>3</b>Cast</a><a href="#step-scene"><b>4</b>Scene</a><a href="#step-camera"><b>5</b>Camera</a><a href="#step-prompt"><b>6</b>Prompt</a><a href="#step-motion"><b>7</b>Motion</a>
+  </nav>
+</div>
+
+<main id="ether-studio">
+<div class="layout">
+<section class="library card" id="step-look" aria-label="Style library">
+  <div class="card-head"><span class="num">01</span><h2>Choose your look.</h2></div>
+  <div class="seg" role="group" aria-label="Style group">
+    <button type="button" class="tab" id="es-images" aria-pressed="true">Images <small>51</small></button>
+    <button type="button" class="tab" id="es-three" aria-pressed="false">3D <small>21</small></button>
+    <button type="button" class="tab" id="es-anime" aria-pressed="false">Anime <small>33</small></button>
+    <button type="button" class="tab" id="es-donghua" aria-pressed="false">Donghua <small>10</small></button>
+    <button type="button" class="tab" id="es-world" aria-pressed="false">World <small>15</small></button>
+  </div>
+  <div class="lib-tools">
+    <label for="es-search" class="hidden">Find a style</label>
+    <input id="es-search" class="search" type="search" placeholder="Search watercolor, cosmic, clay…" autocomplete="off">
+    <button type="button" id="es-surprise-blend" class="chip">🌍 Surprise blend</button>
+  </div>
   <div class="grid" id="es-grid"></div>
+  <p class="note" style="margin:12px 0 0">Tap to select. Search covers every collection. Previews are illustrative.</p>
 </section>
 
-<section aria-label="Image direction">
-  <h2 style="margin-top:0">Your creative direction</h2>
+<div class="stack">
+<section class="card" id="step-blend" aria-label="Blend">
+  <div class="card-head"><span class="num">02</span><h2>Blend.</h2></div>
   <label for="es-mode">Style mode</label>
   <select id="es-mode"><option value="1">Single style</option><option value="2">Blend 2 styles</option><option value="3">Blend 3 styles</option><option value="4">Blend 4 styles</option></select>
   <div class="panel">
@@ -120,8 +229,10 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
     </div>
     <p class="note" id="es-primary-note" style="margin:8px 0 0">First selected is primary. Weights guide the look; they are not exact model settings.</p>
   </div>
+</section>
 
-  <h2>Characters</h2>
+<section class="card" id="step-cast" aria-label="Characters">
+  <div class="card-head"><span class="num">03</span><h2>Cast your characters.</h2></div>
   <div class="panel">
     <label for="es-character">Scene character</label>
     <select id="es-character">
@@ -153,7 +264,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
     <p class="note" style="margin:6px 0 0">Heritage, skin tone and hair texture shape the people presets and the random character. Ether and Element are never changed.</p>
     <div id="es-character-previews" class="character-previews" role="group" aria-label="Character previews"></div>
     <div class="row" style="margin-top:10px">
-      <button type="button" id="es-new-character" class="chip">🎲 New random character</button>
+      <button type="button" id="es-new-character" class="chip primary">🎲 New random character</button>
       <label class="check" style="margin:0"><input type="checkbox" id="es-reroll"> New character every time I copy</label>
     </div>
     <p class="note" style="margin:6px 0 0">Mixes age, build, face, hair, outfit and personality, using your heritage choice above, so every scene gets a different person.</p>
@@ -195,20 +306,27 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
       <button type="button" id="es-reset-looks" class="chip" style="margin-top:10px">Restore starter descriptions</button>
     </details>
   </div>
+</section>
 
+<section class="card" id="step-scene" aria-label="Scene">
+  <div class="card-head"><span class="num">04</span><h2>Set the scene.</h2></div>
   <label for="es-scene">Describe your scene</label>
   <textarea id="es-scene" placeholder="Ether and Element discover a garden of luminous crystals at dusk…"></textarea>
 
-  <p class="note"><a href="locations.html">Browse all locations on a dedicated page →</a></p>
   <label for="es-location">Location</label>
   <div class="loc-row">
     <select id="es-loc-cat" aria-label="Location category"><option value="">All categories</option><option>Futuristic</option><option>Fantasy</option><option>Urban</option><option>Space</option><option>Exotic</option><option>Nature</option><option>Indoors</option><option>Elemental worlds</option><option>Historical</option><option>Events and seasons</option><option>Dreamlike</option><option>Tiny and giant scale</option></select>
     <select id="es-location"></select>
-    <button type="button" id="es-loc-random" title="Pick a random location from this category">Surprise me</button>
+    <button type="button" id="es-loc-random" title="Pick a random location from this category">🎲 Surprise</button>
   </div>
   <input id="es-location-custom" class="hidden" style="margin-top:8px" placeholder="Describe the location, e.g. a quiet front porch on a summer street" aria-label="Custom location">
 
-  <span id="es-location-preview" aria-hidden="true" hidden style="max-width:240px;margin-top:12px"></span>
+  <span id="es-location-preview" aria-hidden="true" hidden style="max-width:240px;margin-top:14px;border-radius:14px;overflow:hidden"></span>
+  <p class="note" style="margin-top:10px"><a href="locations.html">Browse all 570 locations →</a></p>
+</section>
+
+<section class="card" id="step-camera" aria-label="Camera and light">
+  <div class="card-head"><span class="num">05</span><h2>Camera &amp; light.</h2></div>
   <div class="controls">
     <div><label for="es-ratio">Aspect ratio</label><select id="es-ratio"><option>1:1 Square</option><option>16:9 Landscape</option><option>9:16 Portrait</option><option>4:3 Classic</option><option>3:4 Portrait</option><option>3:2 Photo</option><option>2:3 Portrait</option><option>21:9 Cinematic</option></select></div>
     <div><label for="es-shot">Shot size</label><select id="es-shot"><option>Medium shot</option><option>Wide establishing shot</option><option>Full body</option><option>Close-up</option><option>Extreme close-up</option></select></div>
@@ -223,18 +341,21 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
   <input id="es-exclude" placeholder="Extra unwanted details or distractions…">
   <p class="note">Text, captions, logos and watermarks are always excluded unless your scene asks for text. 3D looks create images, not editable 3D models.</p>
   <p class="note hidden" id="es-mj-note">Midjourney: add character sheets with its image/character reference feature in the Midjourney app; the prompt itself stays text-only.</p>
+</section>
 
-  <div class="row" style="margin-top:14px">
+<section class="card" id="step-prompt" aria-label="Your prompt">
+  <div class="card-head"><span class="num">06</span><h2>Your prompt.</h2></div>
+  <div class="row">
     <button type="button" class="primary" id="es-copy-image">Copy image prompt</button>
     <button type="button" id="es-copy-motion">Copy motion prompt</button>
   </div>
   <div id="es-status" class="status" role="status" aria-live="polite"></div>
-
-  <div class="out-head"><h2>Image prompt</h2></div>
   <pre id="es-image-out"></pre>
+</section>
 
-  <h2>From still to motion</h2>
-  <p class="note" style="margin-top:0">Generate the still first, then use it as the start frame with this prompt for Zero's Journey or Ether Cut clips.</p>
+<section class="card" id="step-motion" aria-label="From still to motion">
+  <div class="card-head"><span class="num">07</span><h2>Bring it to life.</h2></div>
+  <p class="note" style="margin-top:-8px">Generate the still first, then use it as the start frame for Zero's Journey or Ether Cut clips.</p>
   <div class="controls">
     <div><label for="es-vtool">Video tool</label><select id="es-vtool"><option value="kling">Kling</option><option value="sora">Sora</option><option value="higgsfield">Higgsfield</option><option value="any">Any video tool</option></select></div>
     <div><label for="es-duration">Duration</label><select id="es-duration"><option>5 seconds</option><option>8 seconds</option><option>10 seconds</option></select></div>
@@ -244,11 +365,17 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
   <label for="es-action">What happens in the shot · optional</label>
   <input id="es-action" placeholder="He spins around laughing as leaves swirl past…">
   <pre id="es-motion-out"></pre>
-
-  <p class="note" style="margin-top:18px">This website builds prompts only. It doesn't call an image API or store keys; settings stay in your browser.</p>
 </section>
 </div>
+</div>
+<p class="footnote">This site builds prompts only. It doesn't call an image API or store keys, and your settings stay in this browser.</p>
 </main>
+
+<div class="dock" role="group" aria-label="Quick copy">
+  <span class="dock-status" id="es-dock-status">Ready when you are.</span>
+  <button type="button" class="primary" data-copy="image">Copy image prompt</button>
+  <button type="button" data-copy="motion">Motion</button>
+</div>
 
 <script src="locations-data.js"></script>
 <script src="anime-data.js"></script>
@@ -860,6 +987,8 @@ $('loc-random').onclick = () => {
 };
 $('copy-image').onclick = () => copy('image');
 $('copy-motion').onclick = () => copy('motion');
+document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => copy(btn.dataset.copy));
+new MutationObserver(() => { const t = $('status').textContent; if (t) $('dock-status').textContent = t; }).observe($('status'), {childList: true, characterData: true, subtree: true});
 
 buildHeritageMenu();
 buildLocations('');
