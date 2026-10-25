@@ -1,5 +1,7 @@
 # Thumbnail prompts for 30 new styles
 
+These thumbnails are now in the studio (styles 42–71). The prompts are kept here for regenerating or replacing any of them.
+
 One prompt per new style. Every prompt uses the same subject and setting so the new thumbnails read as one set: the only thing that changes between them is the style.
 
 ## The shared subject

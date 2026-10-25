@@ -580,10 +580,11 @@ function tileFor(s, showGroup) {
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
   if (s.group === 'Anime looks') {
+    t.style.backgroundImage = 'none'; // don't show the main sprite while the anime atlas lazy-loads
     decorateThumbnail(t, 'anime', s.id);
   } else if (s.tile >= 42) {
     const tile = (s.tile - 42) % 15;
-    t.style.backgroundImage = `url('assets/styles-new-${s.tile < 57 ? 1 : 2}.jpg')`;
+    t.style.backgroundImage = `url('assets/styles-new-${s.tile < 57 ? 1 : 2}.webp')`;
     t.style.backgroundSize = '300% 500%';
     t.style.backgroundPosition = `${(tile % 3) * 50}% ${Math.floor(tile / 3) * 25}%`;
   } else {
