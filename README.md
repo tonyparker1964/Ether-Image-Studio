@@ -2,15 +2,30 @@
 
 [Open Ether Image Studio](https://tonyparker1964.github.io/Ether-Image-Studio/)
 
-Explore 30 image styles and 12 3D looks with visual examples. Choose one style or blend exactly 2, 3, or 4. Adjust blend weights, composition, framing, lighting, and cinematic direction. Settings stay in your browser.
+Explore 30 image styles and 12 3D looks with visual examples. Choose one style or blend 2, 3 or 4, then set the scene, characters, composition, lighting and film look. The studio builds two prompts: one for the still image and a matching motion prompt to animate it. Settings stay in your browser.
 
 ## Create an image
 
 1. Choose your styles and describe your scene.
-2. Build and copy your image request.
-3. Paste the request into ChatGPT to generate the image. Attach any character reference images there.
+2. Optionally include **Ether** and **Element**. Pick Element's form (tiger, earth, water, fire, air or a blend) and tick the box if you're attaching a character sheet. Edit the character descriptions under "Edit character looks" to match your sheets.
+3. Pick your image tool:
+   - **ChatGPT / Gemini** gives a structured natural-language prompt.
+   - **Midjourney** gives a one-line prompt with `--ar` and `--no`. Add character sheets with Midjourney's reference feature.
+4. Copy the image prompt and paste it into your tool, attaching any character sheets there.
+
+## Animate it
+
+Under **From still to motion**, choose the video tool (Kling, Sora, Higgsfield or any), duration, camera move and pacing, and describe what happens. Copy the motion prompt and use your generated still as the first frame.
+
+## Notes
 
 This public website builds prompts; it does not call an image API or contain API keys. Style thumbnails are illustrative AI-generated examples. 3D looks produce raster image aesthetics, not editable 3D models.
+
+## Files
+
+- `index.html` is the whole app.
+- `assets/styles.webp` is the 6 × 7 thumbnail sprite (200 px tiles, one per style, in list order).
+- `assets/og.jpg` is the link-preview image.
 
 ## Hosting
 
