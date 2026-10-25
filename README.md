@@ -2,7 +2,7 @@
 
 [Open Ether Image Studio](https://tonyparker1964.github.io/Ether-Image-Studio/)
 
-Explore 105 looks with visual examples: 51 image styles, 21 3D looks and 33 Japanese anime looks. Choose one or blend 2, 3 or 4, then set the scene, characters, location, composition, lighting and film look. The studio builds two prompts: one for the still image and a matching motion prompt to animate it. Settings stay in your browser.
+Explore 130 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 donghua and fusion looks, and 15 world anime looks from Korea, France, the USA, Africa, Latin America, India, the Philippines and more. Choose one or blend 2, 3 or 4, then set the scene, characters, location, composition, lighting and film look. The studio builds two prompts: one for the still image and a matching motion prompt to animate it. Settings stay in your browser.
 
 ## Pages
 
@@ -12,9 +12,10 @@ Explore 105 looks with visual examples: 51 image styles, 21 3D looks and 33 Japa
 
 ## Create an image
 
-1. Choose your styles and describe your scene.
+1. Choose your styles and describe your scene. **🌍 Surprise world blend** picks a world anime look plus one or two anime or donghua looks for you.
 2. Pick a location: 570 options in 12 categories (Futuristic, Fantasy, Urban, Space, Exotic, Nature and more), a "Surprise me" button, or type your own.
 3. Add characters:
+   - **🎲 New random character:** builds an original person by mixing age, heritage, build, face, hair, eyes, outfit, a prop and personality. Tick **New character every time I copy** to get a different character with each prompt. Ether and Element are never changed.
    - **Scene character:** a preset (boy, girl, adult, elder, tiger, fox, robot, fantasy guardian) or your own. Edit the description to match your character.
    - **Ether and Element:** pick Element's form (tiger, earth, water, fire, air or a blend). Edit both under "Edit character looks".
    - Tick the reference box for any character whose sheet you're attaching.
@@ -34,7 +35,7 @@ This public website builds prompts; it does not call an image API or contain API
 ## Files
 
 - `index.html`, `locations.html`, `anime.html` are the three pages.
-- `locations-data.js` holds the 570 locations; `anime-data.js` holds the 33 anime looks.
+- `locations-data.js` holds the 570 locations; `anime-data.js` holds the 33 anime looks; `donghua-data.js` holds the donghua looks; `world-anime-data.js` holds the 15 world anime looks (gradient thumbnails, no atlas).
 - `thumbnails.js` maps each location, anime look and character preset to its tile in an atlas, and lazy-loads previews as they scroll into view.
 - `assets/styles.webp` holds the first 42 style thumbnails (6 × 7 grid); `assets/styles-new-1.webp` and `-2.webp` hold styles 42–71 (3 × 5 grids).
 - `assets/thumbnails/` holds the location, anime and character atlases (WebP, exact grids).
