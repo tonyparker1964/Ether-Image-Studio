@@ -99,7 +99,6 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
     <button type="button" class="tab" id="es-anime" aria-pressed="false">33 anime looks</button>
     <button type="button" class="tab" id="es-donghua" aria-pressed="false">10 donghua &amp; fusion looks</button>
     <button type="button" class="tab" id="es-world" aria-pressed="false">15 world styles</button>
-    <button type="button" class="tab" id="es-world" aria-pressed="false">15 world anime looks</button>
   </div>
   <button type="button" id="es-surprise-blend" class="chip" style="margin-top:8px">🌍 Surprise world blend</button>
   <label for="es-search">Find a style</label>
@@ -138,12 +137,26 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
       </optgroup>
       <option value="custom">Custom character</option>
     </select>
+    <label for="es-heritage">Heritage</label>
+    <select id="es-heritage"></select>
+    <details style="margin-top:8px">
+      <summary>More appearance options</summary>
+      <div class="mini">
+        <div><label for="es-skin">Skin tone</label><select id="es-skin">
+          <option value="">Any</option><option value="fair skin">Fair</option><option value="light skin">Light</option><option value="light olive skin">Olive</option><option value="medium tan skin">Medium</option><option value="warm brown skin">Brown</option><option value="deep brown skin">Deep brown</option><option value="very deep, dark skin">Very deep</option>
+        </select></div>
+        <div><label for="es-texture">Hair texture</label><select id="es-texture">
+          <option value="">Any</option><option value="straight">Straight</option><option value="wavy">Wavy</option><option value="curly">Curly</option><option value="coily">Coily</option>
+        </select></div>
+      </div>
+    </details>
+    <p class="note" style="margin:6px 0 0">Heritage, skin tone and hair texture shape the people presets and the random character. Ether and Element are never changed.</p>
     <div id="es-character-previews" class="character-previews" role="group" aria-label="Character previews"></div>
     <div class="row" style="margin-top:10px">
       <button type="button" id="es-new-character" class="chip">🎲 New random character</button>
       <label class="check" style="margin:0"><input type="checkbox" id="es-reroll"> New character every time I copy</label>
     </div>
-    <p class="note" style="margin:6px 0 0">Mixes age, heritage, build, hair, outfit and personality so every scene gets a different person. Ether and Element are never changed.</p>
+    <p class="note" style="margin:6px 0 0">Mixes age, build, face, hair, outfit and personality, using your heritage choice above, so every scene gets a different person.</p>
     <div id="es-character-options" class="hidden">
       <label for="es-character-look">Character appearance</label>
       <textarea id="es-character-look" style="min-height:70px" placeholder="Describe their age, skin tone, hair, clothing, markings, and personality…"></textarea>
@@ -241,7 +254,6 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 <script src="anime-data.js"></script>
 <script src="donghua-data.js"></script>
 <script src="world-data.js"></script>
-<script src="world-anime-data.js"></script>
 <script src="thumbnails.js"></script>
 <script>
 (() => {
@@ -329,13 +341,14 @@ const getStyle = id => styles.find(s => s.id === id);
 
 const MONO = new Set(['i8', 'i10', 'i23', 'd12']);
 
+// People presets are templates: heritage, skin tone and hair texture are filled in from the menus.
 const CHARACTER_PRESETS = {
-  boy: {name: 'Boy explorer', look: 'A young Black boy explorer with warm brown skin, short curly hair, a teal jacket, and a curious, fearless spirit'},
-  girl: {name: 'Girl explorer', look: 'A young Black girl explorer with warm brown skin, natural hair in two puffs, a golden-yellow jacket, and a curious, adventurous spirit'},
-  man: {name: 'Adult man', look: 'An adult Black man with deep brown skin, short natural hair, an indigo jacket, and a calm, confident presence'},
-  woman: {name: 'Adult woman', look: 'An adult Black woman with deep brown skin, natural curls, an emerald outfit, and a confident, creative presence'},
-  'elder-man': {name: 'Elder man', look: 'An elder Black man with rich brown skin, silver hair and beard, an earth-toned robe, and a thoughtful, warm expression'},
-  'elder-woman': {name: 'Elder woman', look: 'An elder Black woman with rich brown skin, silver natural curls, a patterned indigo shawl, and a wise, warm expression'},
+  boy: {name: 'Boy explorer', person: {who: 'young boy explorer', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short coily hair'}, rest: 'a teal jacket, and a curious, fearless spirit'}},
+  girl: {name: 'Girl explorer', person: {who: 'young girl explorer', hair: {any: 'hair in two pigtails', straight: 'straight hair in two high pigtails', wavy: 'wavy hair in two pigtails', curly: 'curly hair in two puffs', coily: 'natural coily hair in two puffs'}, rest: 'a golden-yellow jacket, and a curious, adventurous spirit'}},
+  man: {name: 'Adult man', person: {who: 'adult man', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair'}, rest: 'an indigo jacket, and a calm, confident presence'}},
+  woman: {name: 'Adult woman', person: {who: 'adult woman', hair: {any: 'shoulder-length hair', straight: 'long straight hair', wavy: 'loose waves', curly: 'natural curls', coily: 'natural coily hair'}, rest: 'an emerald outfit, and a confident, creative presence'}},
+  'elder-man': {name: 'Elder man', person: {who: 'elder man', hair: {any: 'silver hair and beard', straight: 'straight silver hair and beard', wavy: 'wavy silver hair and beard', curly: 'curly silver hair and beard', coily: 'coily silver hair and beard'}, rest: 'an earth-toned robe, and a thoughtful, warm expression'}},
+  'elder-woman': {name: 'Elder woman', person: {who: 'elder woman', hair: {any: 'silver hair', straight: 'straight silver hair in a low bun', wavy: 'wavy silver hair', curly: 'silver curls', coily: 'silver natural coily hair'}, rest: 'a patterned indigo shawl, and a wise, warm expression'}},
   tiger: {name: 'Tiger', look: 'An expressive tiger with orange fur, recognizable black stripes, bright amber eyes, and a curious, courageous presence'},
   fox: {name: 'Fox explorer', look: 'An expressive red fox explorer with russet fur, a white muzzle, dark paws, a teal scarf, and a small satchel'},
   robot: {name: 'Robot companion', look: 'A friendly original robot with rounded brass and teal panels, expressive luminous eyes, articulated limbs, and a curious personality'},
@@ -343,13 +356,69 @@ const CHARACTER_PRESETS = {
   custom: {name: 'Custom character', look: ''}
 };
 
+// ---------- heritage ----------
+const HERITAGE_GROUPS = {
+  'Africa & diaspora': ['African American','Black British','West African','Nigerian','Ghanaian','Senegalese','East African','Ethiopian','Kenyan','Somali','North African','South African'],
+  'East Asia': ['Chinese','Japanese','Korean','Mongolian','Taiwanese'],
+  'South Asia': ['Indian','Pakistani','Bangladeshi','Sri Lankan','Nepali'],
+  'Southeast Asia': ['Filipino','Vietnamese','Thai','Indonesian','Malaysian','Cambodian'],
+  'Middle East': ['Arab','Persian','Turkish','Kurdish','Lebanese'],
+  'Europe': ['Irish','Scottish','Italian','Greek','Spanish','French','German','Nordic','Slavic'],
+  'Latin America': ['Mexican','Brazilian','Colombian','Peruvian','Argentine','Afro-Latino'],
+  'Caribbean': ['Jamaican','Haitian','Trinidadian','Puerto Rican','Cuban','Dominican'],
+  'Indigenous peoples': ['Native American','Inuit','Maya','Quechua','Sámi','Aboriginal Australian'],
+  'Pacific Islands': ['Samoan','Māori','Native Hawaiian','Tongan','Fijian'],
+  'Mixed': ['mixed-heritage']
+};
+const ALL_HERITAGES = Object.values(HERITAGE_GROUPS).flat();
+// What "Match the style's region" picks for the primary style
+const STYLE_HERITAGE = {
+  w1: ['Korean'], w2: ['French','Belgian'], w3: ['African American','Mexican-American','Irish-American','Chinese-American','mixed-heritage'],
+  w4: ['Ghanaian','Nigerian','Senegalese','African American','Ethiopian'], w5: ['Mexican','Colombian','Peruvian','Afro-Latino'],
+  w6: ['Indian'], w7: ['Filipino'], w8: ['Slavic','Russian','Ukrainian'], w9: ['Arab','Persian','North African'],
+  w10: ['Indonesian','Thai','Cambodian'], w11: ['Nordic','Norwegian','Icelandic'], w12: ['Brazilian','Afro-Brazilian'],
+  w13: ['Jamaican','Trinidadian','Haitian','Puerto Rican'], w14: ['Japanese'], w15: ['Samoan','Māori','Native Hawaiian','Tongan'],
+  i15: ['Ghanaian','Nigerian','African American','Kenyan'], i43: ['Ghanaian'], i46: ['Persian'], i47: ['Chinese'], i22: ['Japanese'], i23: ['Chinese','Japanese']
+};
+function buildHeritageMenu() {
+  const sel = $('heritage');
+  const opt = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t || v; return o; };
+  const nodes = [opt('', 'Random (any)'), opt('match', 'Match the style\'s region')];
+  Object.entries(HERITAGE_GROUPS).forEach(([g, list]) => {
+    const og = document.createElement('optgroup'); og.label = g;
+    list.forEach(h => og.append(opt(h, h === 'mixed-heritage' ? 'Mixed heritage' : h)));
+    nodes.push(og);
+  });
+  sel.replaceChildren(...nodes);
+}
+function resolveHeritage() {
+  const v = $('heritage').value;
+  if (v && v !== 'match') return v;
+  if (v === 'match' && selected.length) {
+    const s = getStyle(selected[0]);
+    const list = STYLE_HERITAGE[s.id] || (s.group === 'Donghua & Fusion' ? ['Chinese'] : s.group === 'Anime looks' ? ['Japanese'] : null);
+    if (list) return pick(list);
+  }
+  return pick(ALL_HERITAGES);
+}
+const RESPECT = 'Show their heritage through natural, respectful features; avoid caricature or exaggerated stereotypes';
+function presetLook(key) {
+  const p = CHARACTER_PRESETS[key];
+  if (!p) return '';
+  if (!p.person) return p.look;
+  const h = resolveHeritage(), skin = $('skin').value, hair = p.person.hair[$('texture').value || 'any'];
+  const [first, ...rest] = p.person.who.split(' '); // e.g. "young" + "girl explorer"
+  const an = /^[aeiou]/i.test(first) ? 'An' : 'A';
+  return `${an} ${first} ${h} ${rest.join(' ')} with ${skin ? skin + ', ' : ''}${hair}, ${p.person.rest}. ${RESPECT}`;
+}
+
 // ---------- random character builder ----------
 const POOL = {
   age: ['child','teen','young adult','adult','middle-aged','elder'],
-  heritage: ['West African','East African','Japanese','Korean','Chinese','Filipino','Indian','Pakistani','Arab','Persian','Mexican','Brazilian','Andean','Caribbean','Polynesian','Native American','Inuit','Nordic','Slavic','Italian','Irish','Ethiopian','Vietnamese','Thai','Indonesian','mixed-heritage'],
   build: ['slight and wiry','tall and lanky','short and sturdy','broad-shouldered','athletic','soft and round','graceful and willowy'],
   face: ['a round, freckled face','sharp angular features','soft, gentle features','a strong jaw and thick brows','high cheekbones','a small scar across one brow','dimples and a wide smile'],
-  hair: ['silver braids','a messy black topknot','short bleached curls','long flowing indigo hair','a shaved head with painted markings','copper locs tied back','a sleek ponytail streaked with teal','wild cloud-white hair','twin buns with ribbons','a cropped undercut','long dark hair with jade pins','an afro with golden cuffs'],
+  hairColor: ['black','dark brown','silver','copper','indigo-tinted','bleached blonde','cloud-white','teal-streaked','auburn','jet-black'],
+  hairStyle: ['worn in braids','in a messy topknot','cropped short','long and flowing','shaved at the sides','tied back with a cord','in a high ponytail','loose and wild','in twin buns with ribbons','pinned up with jade pins','with golden cuffs'],
   eyes: ['amber eyes','storm-gray eyes','bright green eyes','deep brown eyes','violet eyes','one blue and one gold eye','glowing cyan eyes'],
   outfit: ['a layered hanfu robe with wide sleeves','a futuristic white tactical jacket with glowing seams','a kente-patterned cloak over light armor','a hooded desert robe with brass trinkets','a patched explorer coat with many pockets','an embroidered sari-inspired battle wrap','a fur-trimmed northern tunic','a sleek black streetwear hoodie with neon trim','a carnival-feathered festival outfit','a tapa-patterned voyager wrap','a scholar\'s long coat with ink-stained cuffs','dragon-scale armor with silk sash'],
   extra: ['carrying a carved staff','with a tiny spirit companion on their shoulder','wearing glowing tattoo markings','holding an old map','with a cybernetic arm','wearing a jade pendant','with a satchel of scrolls','wielding a crystal blade','wearing round brass goggles','with paint-splattered hands'],
@@ -357,19 +426,23 @@ const POOL = {
 };
 const pick = a => a[Math.floor(Math.random() * a.length)];
 function randomCharacter() {
-  const age = pick(POOL.age), h = pick(POOL.heritage);
+  const age = pick(POOL.age), h = resolveHeritage(), skin = $('skin').value, tex = $('texture').value;
   const WHO = {
     child: ['young boy','young girl'], teen: ['teenage boy','teenage girl','teen'],
     'young adult': ['young man','young woman','young wanderer'], adult: ['man','woman','traveler'],
     'middle-aged': ['middle-aged man','middle-aged woman'], elder: ['elder man','elder woman','elder sage']
   };
-  const who = pick(WHO[age]);
-  const an = /^[aeiou]/i.test(h) ? 'An' : 'A';
-  return `${an} ${h} ${who}, ${pick(POOL.build)}, with ${pick(POOL.face)}, ${pick(POOL.hair)} and ${pick(POOL.eyes)}, dressed in ${pick(POOL.outfit)}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene`;
+  let who = pick(WHO[age]), lead = h;
+  const m = who.match(/^(young|teenage|middle-aged|elder) (.+)$/);
+  if (m) { lead = m[1] + ' ' + h; who = m[2]; } // "a young Korean man", not "a Korean young man"
+  const an = /^[aeiou]/i.test(lead) ? 'An' : 'A';
+  const hair = `${pick(POOL.hairColor)} ${tex ? tex + ' ' : ''}hair ${pick(POOL.hairStyle)}`;
+  return `${an} ${lead} ${who}, ${pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${pick(POOL.face)}, ${hair} and ${pick(POOL.eyes)}, dressed in ${pick(POOL.outfit)}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
 }
 function setRandomCharacter() {
   $('character').value = 'custom';
   $('character-look').value = randomCharacter();
+  $('character-look').dataset.auto = 'random';
   $('character-ref').checked = false;
   renderCharacters(); renderOutputs(); save();
 }
@@ -385,7 +458,7 @@ const STARTER = {
   }
 };
 const DEFAULTS = {1: [100], 2: [60, 40], 3: [50, 30, 20], 4: [40, 30, 20, 10]};
-const FIELDS = ['character','character-look','mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
+const FIELDS = ['character','heritage','skin','texture','character-look','mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
   'form','ether-look','element-look','cue-earth','cue-water','cue-fire','cue-air','vtool','duration','cam','pace','action'];
 const CHECKS = ['character-ref','ether','ether-ref','element','element-ref','reroll'];
 
@@ -451,7 +524,7 @@ function restore() {
   selected = Array.isArray(state.selected) ? [...new Set(state.selected)].filter(getStyle).slice(0, max) : ['i8'];
   weights = Array.isArray(state.weights) && state.weights.length === selected.length && state.weights.every(Number.isFinite)
     ? state.weights.map(Number) : (DEFAULTS[selected.length] || []).slice();
-  group = ['Image styles','3D looks','Anime looks','Donghua & Fusion','World anime'].includes(state.group) ? state.group : 'Image styles';
+  group = ['Image styles','3D looks','Anime looks','Donghua & Fusion','World styles'].includes(state.group) ? state.group : 'Image styles';
 }
 function fillStarterLooks(force) {
   if (force || !$('ether-look').value.trim()) $('ether-look').value = STARTER.etherLook;
@@ -622,14 +695,7 @@ function tileFor(s, showGroup) {
   b.setAttribute('aria-label', `${s.name}: ${s.description}`);
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
-  if (s.group === 'World anime') {
-    t.style.backgroundImage = `linear-gradient(135deg, ${s.colors[0]}, ${s.colors[1]})`;
-    t.style.backgroundSize = 'cover';
-    t.style.display = 'flex'; t.style.alignItems = 'flex-end'; t.style.justifyContent = 'flex-start';
-    const r = document.createElement('span'); r.textContent = s.region;
-    r.style.cssText = 'font:600 11px/1.2 system-ui,sans-serif;color:#fff;padding:6px 8px;text-shadow:0 1px 3px rgba(0,0,0,.6)';
-    t.append(r);
-  } else if (s.group === 'World styles') {
+  if (s.group === 'World styles') {
     decorateWorldThumbnail(t,s);
   } else if (s.group === 'Donghua & Fusion') {
     decorateDonghuaThumbnail(t, s);
@@ -664,7 +730,6 @@ function renderGrid() {
   $('anime').setAttribute('aria-pressed', String(group === 'Anime looks'));
   $('donghua').setAttribute('aria-pressed', String(group === 'Donghua & Fusion'));
   $('world').setAttribute('aria-pressed', String(group === 'World styles'));
-  $('world').setAttribute('aria-pressed', String(group === 'World anime'));
   const q = $('search').value.trim().toLowerCase();
   const list = q ? styles.filter(s => `${s.name} ${s.description} ${s.group}`.toLowerCase().includes(q)) : styles.filter(s => s.group === group);
   $('grid').replaceChildren(...list.map(s => tileFor(s, !!q)));
@@ -733,7 +798,8 @@ function render() { renderGrid(); renderSelection(); renderCharacters(); renderO
 // ---------- events ----------
 $('character').addEventListener('change', () => {
   const preset = CHARACTER_PRESETS[$('character').value];
-  $('character-look').value = preset ? preset.look : '';
+  $('character-look').value = presetLook($('character').value);
+  $('character-look').dataset.auto = preset && preset.person ? 'preset' : '';
   $('character-ref').checked = false;
   renderCharacters(); renderOutputs(); save();
 });
@@ -742,18 +808,25 @@ $('three').onclick = () => { group = '3D looks'; $('search').value = ''; render(
 $('world').onclick = () => {group='World styles';$('search').value='';render();save();};
 $('donghua').onclick = () => { group = 'Donghua & Fusion'; $('search').value = ''; render(); save(); };
 $('anime').onclick = () => { group = 'Anime looks'; $('search').value = ''; render(); save(); };
-$('world').onclick = () => { group = 'World anime'; $('search').value = ''; render(); save(); };
 $('surprise-blend').onclick = () => {
-  const pool = styles.filter(x => x.group === 'World anime' || x.group === 'Anime looks' || x.group === 'Donghua & Fusion');
+  const pool = styles.filter(x => x.group === 'World styles' || x.group === 'Anime looks' || x.group === 'Donghua & Fusion');
   const worldPick = WORLD_STYLES[Math.floor(Math.random() * WORLD_STYLES.length)];
   const n = 2 + Math.floor(Math.random() * 2);
   const ids = [worldPick.id];
   while (ids.length < n) { const c = pick(pool).id; if (!ids.includes(c)) ids.push(c); }
-  $('mode').value = String(n); selected = ids; weights = DEFAULTS[n].slice(); group = 'World anime'; $('search').value = '';
+  $('mode').value = String(n); selected = ids; weights = DEFAULTS[n].slice(); group = 'World styles'; $('search').value = '';
   $('status').textContent = 'Blend: ' + ids.map(i => getStyle(i).name).join(' + ');
   render(); save();
 };
 $('new-character').onclick = setRandomCharacter;
+// Changing heritage, skin or hair rewrites the character, unless you've typed your own description
+['heritage','skin','texture'].forEach(k => $(k).addEventListener('change', () => {
+  const auto = $('character-look').dataset.auto, preset = CHARACTER_PRESETS[$('character').value];
+  if (auto === 'random') $('character-look').value = randomCharacter();
+  else if (preset && preset.person && auto === 'preset') $('character-look').value = presetLook($('character').value);
+  renderOutputs(); save();
+}));
+$('character-look').addEventListener('input', () => { $('character-look').dataset.auto = ''; });
 $('search').oninput = renderGrid;
 $('mode').onchange = () => {
   const max = +$('mode').value;
@@ -788,6 +861,7 @@ $('loc-random').onclick = () => {
 $('copy-image').onclick = () => copy('image');
 $('copy-motion').onclick = () => copy('motion');
 
+buildHeritageMenu();
 buildLocations('');
 restore();
 fillStarterLooks(false);
