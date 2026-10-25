@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ether Image Studio</title>
-<meta name="description" content="Ether Image Studio: explore 130 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
+<meta name="description" content="Ether Image Studio: explore 146 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
 <meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ether Image Studio">
-<meta property="og:description" content="Explore 130 visual styles, blend up to four, and build image and motion prompts.">
+<meta property="og:description" content="Explore 146 visual styles, blend up to four, and build image and motion prompts.">
 <meta property="og:url" content="https://tonyparker1964.github.io/Ether-Image-Studio/">
 <meta property="og:image" content="https://tonyparker1964.github.io/Ether-Image-Studio/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -189,7 +189,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
 <div class="hero">
   <div class="eyebrow">Ether Image Studio 2.7</div>
   <h1>Imagine beyond<br>the ordinary.</h1>
-  <p class="lede">130 looks from around the world. Blend up to four, cast anyone, and turn one idea into an image and motion prompt.</p>
+  <p class="lede">146 looks from around the world. Blend up to four, cast anyone, and turn one idea into an image and motion prompt.</p>
   <nav class="steps" aria-label="Steps">
     <a href="#step-look"><b>1</b>Look</a><a href="#step-blend"><b>2</b>Blend</a><a href="#step-cast"><b>3</b>Cast</a><a href="#step-scene"><b>4</b>Scene</a><a href="#step-camera"><b>5</b>Camera</a><a href="#step-prompt"><b>6</b>Prompt</a><a href="#step-motion"><b>7</b>Motion</a>
   </nav>
@@ -205,6 +205,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
     <button type="button" class="tab" id="es-anime" aria-pressed="false">Anime <small>33</small></button>
     <button type="button" class="tab" id="es-donghua" aria-pressed="false">Donghua <small>10</small></button>
     <button type="button" class="tab" id="es-world" aria-pressed="false">World <small>15</small></button>
+    <button type="button" class="tab" id="es-visions" aria-pressed="false">Visions <small>16</small></button>
   </div>
   <div class="lib-tools">
     <label for="es-search" class="hidden">Find a style</label>
@@ -381,6 +382,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
 <script src="anime-data.js"></script>
 <script src="donghua-data.js"></script>
 <script src="world-data.js"></script>
+<script src="visions-data.js"></script>
 <script src="thumbnails.js"></script>
 <script>
 (() => {
@@ -461,7 +463,7 @@ const STYLE_DATA = [
  ["d20","Marble Statue","Polished veined marble, carved detail, museum spotlight",70],
  ["d21","Balloon Inflatable","Twisted balloon shapes, glossy latex, bright playful color",71]
 ];
-const styles = STYLE_DATA.map(([id, name, description, tile]) => ({id, name, description, tile, group: id[0] === 'i' ? 'Image styles' : '3D looks'})).concat(ANIME_STYLES.map(s => ({...s, group:'Anime looks'})), DONGHUA_STYLES, WORLD_STYLES);
+const styles = STYLE_DATA.map(([id, name, description, tile]) => ({id, name, description, tile, group: id[0] === 'i' ? 'Image styles' : '3D looks'})).concat(ANIME_STYLES.map(s => ({...s, group:'Anime looks'})), DONGHUA_STYLES, WORLD_STYLES, VISIONS_STYLES);
 const getStyle = id => styles.find(s => s.id === id);
 // Location library, grouped by category
 
@@ -505,6 +507,7 @@ const STYLE_HERITAGE = {
   w6: ['Indian'], w7: ['Filipino'], w8: ['Slavic','Russian','Ukrainian'], w9: ['Arab','Persian','North African'],
   w10: ['Indonesian','Thai','Cambodian'], w11: ['Nordic','Norwegian','Icelandic'], w12: ['Brazilian','Afro-Brazilian'],
   w13: ['Jamaican','Trinidadian','Haitian','Puerto Rican'], w14: ['Japanese'], w15: ['Samoan','Māori','Native Hawaiian','Tongan'],
+  v1: ['Egyptian','Nubian','Sudanese','Ethiopian'], v2: ['West African','Nigerian','Ghanaian','Senegalese'], v9: ['Nubian','Egyptian','Sudanese','Ethiopian','Somali'], v10: ['Egyptian','Nubian','Sudanese','Ethiopian'], v16: ['North African','Somali','Ethiopian','Arab'],
   i15: ['Ghanaian','Nigerian','African American','Kenyan'], i43: ['Ghanaian'], i46: ['Persian'], i47: ['Chinese'], i22: ['Japanese'], i23: ['Chinese','Japanese']
 };
 function buildHeritageMenu() {
@@ -651,7 +654,7 @@ function restore() {
   selected = Array.isArray(state.selected) ? [...new Set(state.selected)].filter(getStyle).slice(0, max) : ['i8'];
   weights = Array.isArray(state.weights) && state.weights.length === selected.length && state.weights.every(Number.isFinite)
     ? state.weights.map(Number) : (DEFAULTS[selected.length] || []).slice();
-  group = ['Image styles','3D looks','Anime looks','Donghua & Fusion','World styles'].includes(state.group) ? state.group : 'Image styles';
+  group = ['Image styles','3D looks','Anime looks','Donghua & Fusion','World styles','Ether Visions'].includes(state.group) ? state.group : 'Image styles';
 }
 function fillStarterLooks(force) {
   if (force || !$('ether-look').value.trim()) $('ether-look').value = STARTER.etherLook;
@@ -822,7 +825,14 @@ function tileFor(s, showGroup) {
   b.setAttribute('aria-label', `${s.name}: ${s.description}`);
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
-  if (s.group === 'World styles') {
+  if (s.group === 'Ether Visions') {
+    t.style.backgroundImage = `radial-gradient(circle at 70% 25%, ${s.colors[1]}cc 0, transparent 55%), linear-gradient(160deg, ${s.colors[0]}, #050505)`;
+    t.style.backgroundSize = 'cover';
+    t.style.display = 'flex'; t.style.alignItems = 'flex-end';
+    const r = document.createElement('span'); r.textContent = s.mood;
+    r.style.cssText = 'font:600 11px/1.2 -apple-system,system-ui,sans-serif;color:#f5e6c8;padding:10px 12px;letter-spacing:.02em;text-shadow:0 1px 3px rgba(0,0,0,.7)';
+    t.append(r);
+  } else if (s.group === 'World styles') {
     decorateWorldThumbnail(t,s);
   } else if (s.group === 'Donghua & Fusion') {
     decorateDonghuaThumbnail(t, s);
@@ -857,6 +867,7 @@ function renderGrid() {
   $('anime').setAttribute('aria-pressed', String(group === 'Anime looks'));
   $('donghua').setAttribute('aria-pressed', String(group === 'Donghua & Fusion'));
   $('world').setAttribute('aria-pressed', String(group === 'World styles'));
+  $('visions').setAttribute('aria-pressed', String(group === 'Ether Visions'));
   const q = $('search').value.trim().toLowerCase();
   const list = q ? styles.filter(s => `${s.name} ${s.description} ${s.group}`.toLowerCase().includes(q)) : styles.filter(s => s.group === group);
   $('grid').replaceChildren(...list.map(s => tileFor(s, !!q)));
@@ -933,6 +944,7 @@ $('character').addEventListener('change', () => {
 $('images').onclick = () => { group = 'Image styles'; $('search').value = ''; render(); save(); };
 $('three').onclick = () => { group = '3D looks'; $('search').value = ''; render(); save(); };
 $('world').onclick = () => {group='World styles';$('search').value='';render();save();};
+$('visions').onclick = () => { group = 'Ether Visions'; $('search').value = ''; render(); save(); };
 $('donghua').onclick = () => { group = 'Donghua & Fusion'; $('search').value = ''; render(); save(); };
 $('anime').onclick = () => { group = 'Anime looks'; $('search').value = ''; render(); save(); };
 $('surprise-blend').onclick = () => {

@@ -2,7 +2,7 @@
 
 [Open Ether Image Studio](https://tonyparker1964.github.io/Ether-Image-Studio/)
 
-Explore 130 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 donghua and fusion looks, and 15 world anime looks from Korea, France, the USA, Africa, Latin America, India, the Philippines and more. Choose one or blend 2, 3 or 4, then set the scene, characters, location, composition, lighting and film look. The studio builds two prompts: one for the still image and a matching motion prompt to animate it. Settings stay in your browser.
+Explore 146 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 donghua and fusion looks, 15 world styles from Korea, France, the USA, Africa, Latin America, India, the Philippines and more, and 16 Ether Visions: cinematic, cosmic and spiritual looks such as Kemet Starpilot, Sacred Geometry Cosmos and Silent Monastery. Choose one or blend 2, 3 or 4, then set the scene, characters, location, composition, lighting and film look. The studio builds two prompts: one for the still image and a matching motion prompt to animate it. Settings stay in your browser.
 
 ## Pages
 
@@ -36,7 +36,7 @@ This public website builds prompts; it does not call an image API or contain API
 ## Files
 
 - `index.html`, `locations.html`, `anime.html` are the three pages.
-- `locations-data.js` holds the 570 locations; `anime-data.js` holds the 33 anime looks; `donghua-data.js` holds the donghua looks; `world-data.js` holds the 15 world styles.
+- `locations-data.js` holds the 570 locations; `anime-data.js` holds the 33 anime looks; `donghua-data.js` holds the donghua looks; `world-data.js` holds the 15 world styles; `visions-data.js` holds the 16 Ether Visions (gradient thumbnails for now).
 - `thumbnails.js` maps each location, anime look and character preset to its tile in an atlas, and lazy-loads previews as they scroll into view.
 - `assets/styles.webp` holds the first 42 style thumbnails (6 × 7 grid); `assets/styles-new-1.webp` and `-2.webp` hold styles 42–71 (3 × 5 grids).
 - `assets/thumbnails/` holds the location, anime and character atlases (WebP, exact grids).
