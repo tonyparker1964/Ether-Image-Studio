@@ -74,6 +74,8 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 .out-head h2{margin:0}
 .empty{color:var(--es-sub);font-size:13px;padding:10px;grid-column:1/-1}
 .hidden{display:none!important}
+.loc-row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.4fr) auto;gap:8px}
+@media(max-width:600px){.loc-row{grid-template-columns:1fr 1fr}.loc-row select#es-location{grid-column:1/-1;grid-row:1}}
 .mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.library{position:static}.grid{max-height:none}}
 @media(max-width:600px){body{padding:8px}main{padding:16px}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -82,7 +84,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 </head>
 <body>
 <main id="ether-studio">
-<div class="eyebrow">ETHER IMAGE STUDIO · 2.2</div>
+<div class="eyebrow">ETHER IMAGE STUDIO · 2.3</div>
 <h1>Imagine beyond the ordinary.</h1>
 <p>Choose a look. Blend your influences. Bring Ether and Element into the scene, then take it from still to motion.</p>
 
@@ -149,22 +151,11 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
   <textarea id="es-scene" placeholder="Ether and Element discover a garden of luminous crystals at dusk…"></textarea>
 
   <label for="es-location">Location</label>
-  <select id="es-location">
-    <option value="">None (use the scene description)</option>
-    <optgroup label="Nature">
-      <option>City park</option><option>Enchanted forest</option><option>Rainforest jungle</option><option>Sandy beach</option><option>Mountain peak</option><option>Desert dunes</option><option>Snowy field</option><option>Riverbank</option><option>Wildflower meadow</option><option>Waterfall</option><option>Cave</option><option>Savanna</option><option>Coral reef underwater</option>
-    </optgroup>
-    <optgroup label="City and neighborhood">
-      <option>Busy city street</option><option>Rooftop overlooking the city</option><option>Backyard</option><option>Playground</option><option>Basketball court</option><option>Skate park</option><option>Train station</option><option>Open-air market</option><option>Subway car</option>
-    </optgroup>
-    <optgroup label="Indoors">
-      <option>Bedroom</option><option>Kitchen</option><option>Living room</option><option>Classroom</option><option>Library</option><option>Museum hall</option><option>Art studio</option><option>Recording studio</option><option>Theater stage</option>
-    </optgroup>
-    <optgroup label="Fantasy and sci-fi">
-      <option>Moonlit garden with stone arches</option><option>Floating islands</option><option>Ancient temple ruins</option><option>Castle courtyard</option><option>Crystal cave</option><option>Cloud kingdom</option><option>Underwater city</option><option>Alien planet</option><option>Space station</option><option>Futuristic city</option>
-    </optgroup>
-    <option value="custom">Custom location…</option>
-  </select>
+  <div class="loc-row">
+    <select id="es-loc-cat" aria-label="Location category"><option value="">All categories</option><option>Futuristic</option><option>Fantasy</option><option>Urban</option><option>Space</option><option>Exotic</option><option>Nature</option><option>Indoors</option><option>Elemental worlds</option><option>Historical</option><option>Events and seasons</option><option>Dreamlike</option><option>Tiny and giant scale</option></select>
+    <select id="es-location"></select>
+    <button type="button" id="es-loc-random" title="Pick a random location from this category">Surprise me</button>
+  </div>
   <input id="es-location-custom" class="hidden" style="margin-top:8px" placeholder="Describe the location, e.g. a quiet front porch on a summer street" aria-label="Custom location">
 
   <div class="controls">
@@ -289,6 +280,22 @@ const STYLE_DATA = [
 ];
 const styles = STYLE_DATA.map(([id, name, description, tile]) => ({id, name, description, tile, group: id[0] === 'i' ? 'Image styles' : '3D looks'}));
 const getStyle = id => styles.find(s => s.id === id);
+// Location library, grouped by category
+const LOCATIONS = {
+  "Futuristic": ["Futuristic city","Neon megacity at night","Cyberpunk alley","Rain-soaked neon market","Solarpunk eco-city","Vertical garden skyscrapers","Floating sky city","Floating ocean city","Sea-floor dome city","Desert arcology","Underground bunker city","Arcology atrium","Megastructure interior","Smart city plaza","Floating highway","Flying-car traffic lanes","Maglev train platform","Bullet train interior","Hyperloop station","Rooftop drone port","Drone delivery hub","Self-driving car interior","Robot factory","Android repair shop","Mech hangar","Robot pet park","AI data center","Server room glow","Inside a computer network","Digital grid void","Virtual reality arcade","Esports arena","Hologram concert stage","Holographic shopping mall","Cyber café","Hover-skate park","Futuristic classroom","Futuristic museum of Earth","Futuristic stadium","Smart home living room","Chrome-and-glass penthouse","Neon rooftop garden","Glass dome farm","Hydroponic tower farm","Desert solar farm city","Wind-turbine coastline","Weather control tower","Biotech lab","Neural interface lab","Cybernetic clinic","Cryogenic chamber","Cloning lab","Time machine lab","Teleportation chamber","Underwater research base","Arctic research dome","Battle arena of the future","Recycled-tech scrapyard","Post-apocalyptic ruins","Overgrown abandoned city","Wasteland highway","Retro-futurist 1960s city","Atompunk diner","Steampunk airship dock","Afrofuturist royal city","Afrofuturist market street"],
+  "Fantasy": ["Moonlit garden with stone arches","Enchanted forest","Floating islands","Ancient temple ruins","Castle courtyard","Castle great hall","Golden throne room","Royal ballroom","Wizard's tower","Alchemist's workshop","Potion shop","Magic academy hall","Enchanted library","Dragon's lair","Dragon roost mountain","Fairy village","Fairy ring in the moss","Glowing mushroom cave","Mushroom kingdom forest","Giant beanstalk","Giant's table","Secret garden","Hedge maze","Labyrinth","Enchanted lake","Floating lantern lake","Waterfall city","Mermaid grotto","Underwater kingdom","Crystal palace","Ice palace","Sky castle","Cloud kingdom","Bridge of rainbows","Celestial palace","Realm of the gods above the clouds","Underworld river crossing","Shadow realm","Realm of light","Spirit forest","Ancient tree of life","Sacred grove","Stone circle at midnight","Elemental temple","Elven treehouse city","Dwarven mine hall","Goblin market","Magic marketplace","Troll bridge","Witch's cottage","Haunted mansion","Portal in the woods","Unicorn meadow","Griffin nest cliffs","Phoenix nest","Pirate cove","Sunken treasure cave","Knight's tournament field","Sorcerer's battlefield","Enchanted carnival","Toy kingdom","Clockwork kingdom","Gingerbread village","Candy land","Storybook village","Floating pagoda mountains","Kitsune shrine forest","Desert djinn palace","Flying carpet over a desert city","Anansi's spider-silk forest","Ancient African myth kingdom"],
+  "Urban": ["Busy city street","Quiet side street","Rainy city street at night","Snowy city street","Crosswalk at rush hour","Neon billboard intersection","Downtown skyline","Skyscraper observation deck","Rooftop at sunset","Rooftop overlooking the city","Rooftop pool","Penthouse view","Fire escape","Front stoop of a brownstone","Brownstone block","Apartment balcony","Apartment hallway","Bodega corner","Corner store","Barbershop","Hair salon","Sneaker shop","Record store","Bookstore","Comic book shop","Thrift store","Coffee shop","Bakery","Pizza place","Neon diner at night","Food truck row","Night market","Open-air market","Laundromat at night","Graffiti underpass","Street mural alley","Street basketball cage","Basketball court","Skate park","Playground","City park","Fountain plaza","Town square","Community garden","Urban rooftop garden","Block party","City library steps","Museum steps","Courthouse steps","Movie theater marquee","Jazz club","Concert hall exit","Shopping mall","Food court","Hotel lobby","Office lobby","Stadium concourse","Subway platform","Subway car","Elevated train tracks","Train station","Bus stop in the rain","Taxi back seat","Airport terminal","Gas station at night","Highway overpass","Parking garage rooftop","Tunnel","Bridge over the river","Waterfront boardwalk","Canal city bridge","Harbor docks","Ferry terminal","Shipping container port","Industrial district","Abandoned warehouse","Construction site","Old-town cobblestone street","Small-town main street","Suburban cul-de-sac"],
+  "Space": ["Space station","Spaceship cockpit","Starship bridge","Cargo bay","Starport hangar","Starship docking ring","Escape pod","Spacewalk outside the station","Observation deck with Earth view","Zero-gravity playroom","Orbital greenhouse","Generation-ship garden","Space elevator","Launch pad at liftoff","Mission control room","Planetarium dome","Satellite repair in orbit","Space junkyard","Abandoned spaceship","Moon surface","Moon base","Earthrise from the moon","Mars colony","Mars dust storm","Martian canyon","Jupiter's cloud tops","Saturn's rings","Ice moon surface","Methane lakes of Titan","Asteroid field","Asteroid mining outpost","Riding a comet's tail","Meteor shower over an alien desert","Nebula vista","Galaxy core","Supernova","Pulsar lighthouse","Black hole event horizon","Wormhole tunnel","Rogue planet in darkness","Floating among the stars","Alien planet","Binary-sun desert planet","Alien jungle planet","Ocean planet","Lava planet","Ice planet","Crystal alien desert","Alien coral reef planet","Aurora over an alien world","Gas giant floating city","Alien city","Alien marketplace","Alien temple ruins","Ring world","Inside a Dyson sphere"],
+  "Exotic": ["Tropical island lagoon","Overwater bungalows","Maldives atoll","Bioluminescent beach at night","Black-sand volcanic beach","Pink-sand beach","Turquoise cenote","Hidden jungle waterfall","Rainforest canopy walkway","Amazon river","Mangrove channels","Galápagos shore","Avenue of baobabs at sunset","Serengeti savanna migration","Kilimanjaro foothills","Okavango delta","Victoria Falls","Namib red dunes","Sahara dunes at sunrise","Desert oasis town","Moroccan riad courtyard","Marrakech souk","Blue-painted Moroccan streets","Zanzibar stone-town alley","Ghana coast fishing boats","Ethiopian rock-hewn church","Great Zimbabwe ruins","Nile felucca at sunset","Petra rock-carved city","Wadi Rum red desert","Cappadocia hot-air balloon valley","Dubai desert skyline","Santorini white cliffs","Venetian canals","Amalfi coast cliffs","Lavender fields of Provence","Swiss alpine village","Scottish highland castle","Norwegian fjord","Icelandic glacier lagoon","Northern lights over Iceland","Machu Picchu ruins","Andes salt-flat mirror","Patagonia peaks","Rio hillside overlook","Havana street with vintage cars","Colorful Caribbean street","Mayan jungle ruins","Kyoto bamboo grove","Torii-gate mountain path","Cherry-blossom temple","Bali rice terraces","Thai floating market","Angkor temple ruins","Ha Long Bay limestone islands","Towering stone-pillar forest","Great Wall on misty mountains","Himalayan monastery","Prayer-flag mountain pass","Indian palace courtyard","Rajasthan desert fort","Ganges riverbank at dawn","Australian outback red rock","Great Barrier Reef","New Zealand green hills","Hawaiian lava flow","Antarctic ice shelf"],
+  "Nature": ["Pine forest","Redwood grove","Birch woods","Bamboo forest","Rainforest jungle","Cloud forest","Autumn maple forest","Misty woodland trail","Forest clearing","Orchard","Treehouse village","Mountain peak","Alpine meadow","Rocky cliff edge","Mountain pass","Canyon","Mesa at sunset","Volcanic crater","Highland moor","Hot springs","Glacier valley","Rolling hills","Sandy beach","Rocky shoreline","Tide pools","Sea cliffs","Lighthouse point","Wooden pier","Sailboat deck","Open ocean","Sea cave","Coral reef underwater","Kelp forest","Deep-sea trench","Shipwreck","Riverbank","Waterfall","Mountain stream","Still lake at dawn","Lily pond","Marsh wetland","Bayou","River rapids","Frozen lake","Canoe on a calm river","Stone bridge over a creek","Desert dunes","Red-rock desert","Salt flats","Cactus desert","Badlands","Sandstone arches","Desert night under the stars","Wildflower meadow","Savanna","Prairie","Sunflower field","Wheat field","Rice paddy","Farmyard","Red barn","Vineyard","Pumpkin patch","Country road","Snowy field","Snowy pine forest","Ice cave","Arctic tundra","Frozen waterfall","Igloo camp","Ski slope","Polar sea with icebergs","Cave","Crystal cave","Glowworm cave","Underground river","Cavern with stalactites","Abandoned mine","Lava tube","Above the clouds","Stormy plains","Rainbow over the hills","Foggy morning field","Starry night sky","Hot-air balloon ride","Windswept hilltop"],
+  "Indoors": ["Bedroom","Kid's bedroom","Kitchen","Living room","Dining table","Attic","Basement","Garage","Home office","Cozy reading nook","Blanket fort","Window seat on a rainy day","Hallway with family photos","Classroom","School hallway with lockers","Cafeteria","School gym","Science lab","Library","Music room","Auditorium","Dorm room","Museum hall","Natural history museum","Art gallery","Art studio","Pottery studio","Dance studio","Photography studio","Theater stage","Backstage dressing room","Movie theater","Opera house","Recording studio","Bedroom music studio","Concert stage","Rehearsal garage","Vinyl listening lounge","Radio booth","Hospital room","Doctor's office","Post office","Bank lobby","Hotel room","Elevator","Community center","Church sanctuary","Chapel","Mosque courtyard","Temple","Meditation hall","Zen garden","Candlelit room","Workshop","Newsroom","Fire station"],
+  "Elemental worlds": ["Earth realm of living stone","Moss kingdom","Giant tree roots","Crystal mountain heart","Water realm beneath the waves","Floating water spheres","Endless rain garden","Ocean of mirrors","Fire realm of volcanoes","Ember forest","Lava river city","Air realm of floating islands","Wind temple","Sky bridges","Where all four elements meet"],
+  "Historical": ["Ancient Egyptian temple","Pyramids at dawn","Roman forum","Greek amphitheater","Kingdom of Kush palace","Mali Empire court","Benin royal palace","Great Zimbabwe stone city","Medieval village","Viking longhouse","Feudal Japanese village","Edo-period street","Silk Road caravanserai","Aztec city","Mayan pyramid","Renaissance workshop","Pirate ship deck","Victorian street","Wild West town","1920s jazz club","Harlem Renaissance street","1950s diner","1960s civil rights march","1970s roller disco","1980s arcade","1990s bedroom"],
+  "Events and seasons": ["Birthday party","Family reunion cookout","Wedding reception","Graduation ceremony","School dance","Talent show","Science fair","Holiday living room","Halloween street","Thanksgiving table","New Year's rooftop","Fourth of July fireworks","Lantern festival","Carnival parade","Juneteenth celebration","Kwanzaa gathering","Snow day","First day of school","Summer block party","Amusement park","Carnival with a Ferris wheel","Drive-in movie"],
+  "Dreamlike": ["Starry void","Infinite library","Mirror realm","Sea of clouds at night","Endless staircase","Doorways in the desert","Inner landscape of the mind","Upside-down city","Room of floating lights","Liminal hallway","Sacred geometry temple","Between worlds","Ocean of stars","Memory house","Garden at the edge of time"],
+  "Tiny and giant scale": ["Tiny world among grass blades","Inside a terrarium","Inside a snow globe","Inside a seashell","Inside a clockwork mechanism","Dollhouse room","Model train town","Inside a raindrop","Mouse-sized kitchen","Bookshelf city"]
+};
+
 const MONO = new Set(['i8', 'i10', 'i23', 'd12']);
 
 const STARTER = {
@@ -302,7 +309,7 @@ const STARTER = {
   }
 };
 const DEFAULTS = {1: [100], 2: [60, 40], 3: [50, 30, 20], 4: [40, 30, 20, 10]};
-const FIELDS = ['mode','scene','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
+const FIELDS = ['mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
   'form','ether-look','element-look','cue-earth','cue-water','cue-fire','cue-air','vtool','duration','cam','pace','action'];
 const CHECKS = ['ether','ether-ref','element','element-ref'];
 
@@ -357,10 +364,11 @@ function restore() {
   if (!state) return;
   const v = state.values || {};
   FIELDS.forEach(k => {
-    if (typeof v[k] !== 'string') return;
+    if (typeof v[k] !== 'string' || k === 'location') return;
     const el = $(k);
     if (el.tagName === 'SELECT') setSelect(el, v[k]); else el.value = v[k];
   });
+  buildLocations(typeof v.location === 'string' ? v.location : '');
   CHECKS.forEach(k => { if (typeof v[k] === 'boolean') $(k).checked = v[k]; });
   if (Array.isArray(v.blend)) $('blend').querySelectorAll('input').forEach(c => c.checked = v.blend.includes(c.value));
   const max = +$('mode').value;
@@ -389,6 +397,22 @@ function elementForm() {
     return 'in a blended form combining ' + picks.map(p => clean($('cue-' + p).value).replace(/^\w+ form:\s*/i, '')).join(', plus ');
   }
   return 'in their ' + clean($('cue-' + f).value);
+}
+function buildLocations(keep) {
+  const cat = $('loc-cat').value, sel = $('location');
+  const opt = (value, text) => { const o = document.createElement('option'); o.value = value; o.textContent = text || value; return o; };
+  const nodes = [opt('', 'None (use the scene description)')];
+  const cats = cat ? [cat] : Object.keys(LOCATIONS);
+  const inList = keep && keep !== 'custom' && cats.some(c => LOCATIONS[c].includes(keep));
+  if (keep && keep !== 'custom' && !inList) nodes.push(opt(keep, keep + ' (current)'));
+  cats.forEach(c => {
+    const g = document.createElement('optgroup'); g.label = c;
+    LOCATIONS[c].forEach(name => g.append(opt(name)));
+    nodes.push(g);
+  });
+  nodes.push(opt('custom', 'Custom location…'));
+  sel.replaceChildren(...nodes);
+  sel.value = keep || '';
 }
 function location() {
   const v = $('location').value;
@@ -457,7 +481,7 @@ function chatPrompt() {
 
 function mjPrompt() {
   const s = selected.map(getStyle), parts = [clean($('scene').value)];
-  if (location()) parts.push($('location').value === 'custom' ? 'set at ' + location() : 'in a ' + lower1(location()));
+  if (location()) parts.push('setting: ' + location());
   characters().forEach(c => parts.push(clean(c.text)));
   if (s.length === 1) parts.push(`${s[0].name.toLowerCase()} style, ${lower1(s[0].description)}`);
   else if (s.length > 1) {
@@ -615,9 +639,17 @@ async function copy(which) {
     $('status').textContent = 'Copying was blocked. The prompt is selected below; copy it manually.';
   }
 }
+$('loc-cat').addEventListener('change', () => buildLocations($('location').value));
+$('loc-random').onclick = () => {
+  const cat = $('loc-cat').value, pool = cat ? LOCATIONS[cat] : Object.values(LOCATIONS).flat();
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  buildLocations(pick); renderCharacters(); renderOutputs(); save();
+  $('status').textContent = 'Location: ' + pick;
+};
 $('copy-image').onclick = () => copy('image');
 $('copy-motion').onclick = () => copy('motion');
 
+buildLocations('');
 restore();
 fillStarterLooks(false);
 render();

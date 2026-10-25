@@ -6,7 +6,7 @@ Explore 30 image styles and 12 3D looks with visual examples. Choose one style o
 
 ## Create an image
 
-1. Choose your styles, describe your scene and pick a location (or type your own).
+1. Choose your styles, describe your scene and pick a location: 570 options in 12 categories (Futuristic, Fantasy, Urban, Space, Exotic, Nature and more), a "Surprise me" button, or type your own.
 2. Optionally include **Ether** and **Element**. Pick Element's form (tiger, earth, water, fire, air or a blend) and tick the box if you're attaching a character sheet. Edit the character descriptions under "Edit character looks" to match your sheets.
 3. Pick your image tool:
    - **ChatGPT / Gemini** gives a structured natural-language prompt.
