@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ether Image Studio</title>
-<meta name="description" content="Ether Image Studio: explore 115 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
+<meta name="description" content="Ether Image Studio: explore 130 visual styles, blend up to four, and build image and motion prompts for Ether and Element.">
 <meta name="theme-color" content="#11101b">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Ether Image Studio">
-<meta property="og:description" content="Explore 115 visual styles, blend up to four, and build image and motion prompts.">
+<meta property="og:description" content="Explore 130 visual styles, blend up to four, and build image and motion prompts.">
 <meta property="og:url" content="https://tonyparker1964.github.io/Ether-Image-Studio/">
 <meta property="og:image" content="https://tonyparker1964.github.io/Ether-Image-Studio/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -86,7 +86,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 </head>
 <body>
 <main id="ether-studio">
-<nav class="row" aria-label="Studio navigation" style="margin-bottom:18px"><a href="index.html" aria-current="page">Image Studio</a><a href="locations.html">Explore locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a></nav>
+<nav class="row" aria-label="Studio navigation" style="margin-bottom:18px"><a href="index.html" aria-current="page">Image Studio</a><a href="locations.html">Explore locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
 <div class="eyebrow">ETHER IMAGE STUDIO · 2.6</div>
 <h1>Imagine beyond the ordinary.</h1>
 <p>Choose a look. Blend your influences. Bring Ether and Element into the scene, then take it from still to motion.</p>
@@ -98,6 +98,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
     <button type="button" class="tab" id="es-three" aria-pressed="false">21 3D looks</button>
     <button type="button" class="tab" id="es-anime" aria-pressed="false">33 anime looks</button>
     <button type="button" class="tab" id="es-donghua" aria-pressed="false">10 donghua &amp; fusion looks</button>
+    <button type="button" class="tab" id="es-world" aria-pressed="false">15 world styles</button>
     <button type="button" class="tab" id="es-world" aria-pressed="false">15 world anime looks</button>
   </div>
   <button type="button" id="es-surprise-blend" class="chip" style="margin-top:8px">🌍 Surprise world blend</button>
@@ -239,6 +240,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 <script src="locations-data.js"></script>
 <script src="anime-data.js"></script>
 <script src="donghua-data.js"></script>
+<script src="world-data.js"></script>
 <script src="world-anime-data.js"></script>
 <script src="thumbnails.js"></script>
 <script>
@@ -627,6 +629,8 @@ function tileFor(s, showGroup) {
     const r = document.createElement('span'); r.textContent = s.region;
     r.style.cssText = 'font:600 11px/1.2 system-ui,sans-serif;color:#fff;padding:6px 8px;text-shadow:0 1px 3px rgba(0,0,0,.6)';
     t.append(r);
+  } else if (s.group === 'World styles') {
+    decorateWorldThumbnail(t,s);
   } else if (s.group === 'Donghua & Fusion') {
     decorateDonghuaThumbnail(t, s);
   } else if (s.group === 'Anime looks') {
@@ -659,6 +663,7 @@ function renderGrid() {
   $('three').setAttribute('aria-pressed', String(group === '3D looks'));
   $('anime').setAttribute('aria-pressed', String(group === 'Anime looks'));
   $('donghua').setAttribute('aria-pressed', String(group === 'Donghua & Fusion'));
+  $('world').setAttribute('aria-pressed', String(group === 'World styles'));
   $('world').setAttribute('aria-pressed', String(group === 'World anime'));
   const q = $('search').value.trim().toLowerCase();
   const list = q ? styles.filter(s => `${s.name} ${s.description} ${s.group}`.toLowerCase().includes(q)) : styles.filter(s => s.group === group);
@@ -734,6 +739,7 @@ $('character').addEventListener('change', () => {
 });
 $('images').onclick = () => { group = 'Image styles'; $('search').value = ''; render(); save(); };
 $('three').onclick = () => { group = '3D looks'; $('search').value = ''; render(); save(); };
+$('world').onclick = () => {group='World styles';$('search').value='';render();save();};
 $('donghua').onclick = () => { group = 'Donghua & Fusion'; $('search').value = ''; render(); save(); };
 $('anime').onclick = () => { group = 'Anime looks'; $('search').value = ''; render(); save(); };
 $('world').onclick = () => { group = 'World anime'; $('search').value = ''; render(); save(); };
@@ -786,6 +792,9 @@ buildLocations('');
 restore();
 fillStarterLooks(false);
 const locationParams = new URLSearchParams(window.location.search);
+const incomingWorld = WORLD_STYLES.find(s => s.id === locationParams.get('world'));
+if(incomingWorld){selected=[incomingWorld.id];weights=[100];group='World styles';$('mode').value='1';save();}
+if(locationParams.has('world')){locationParams.delete('world');history.replaceState(null,'',window.location.pathname+(locationParams.size?'?'+locationParams:'')+window.location.hash);}
 const incomingDonghua = DONGHUA_STYLES.find(s => s.id === locationParams.get('donghua'));
 if (incomingDonghua) { selected = [incomingDonghua.id]; weights = [100]; group = 'Donghua & Fusion'; $('mode').value = '1'; save(); }
 if (locationParams.has('donghua')) { locationParams.delete('donghua'); history.replaceState(null, '', window.location.pathname + (locationParams.size ? '?' + locationParams : '') + window.location.hash); }
@@ -819,5 +828,6 @@ render();
 </script>
 </body>
 </html>
+
 
 

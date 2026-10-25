@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Styles · Ether Image Studio</title>
+<meta name="description" content="Explore 15 world-inspired illustration and animation looks. Copy a style description or use it in Ether Image Studio.">
+<style>
+:root{color-scheme:light dark;--page:#ece8f5;--bg:#f6f4fb;--card:#fff;--text:#242038;--sub:#5e5770;--line:#ded7eb;--accent:#6940a8;--on:#fff}
+@media(prefers-color-scheme:dark){:root{--page:#0b0a12;--bg:#11101b;--card:#1c1a2b;--text:#f3efff;--sub:#bdb3d0;--line:#423951;--accent:#d2b3ff;--on:#231235}}
+*{box-sizing:border-box}body{margin:0;padding:24px;background:var(--page);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}main{max-width:1200px;margin:auto;background:var(--bg);border-radius:20px;padding:32px}a{color:var(--accent)}nav{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:32px}.eyebrow{font-size:12px;letter-spacing:2px;color:var(--accent)}h1{font-size:clamp(32px,5vw,54px);letter-spacing:-1.5px;line-height:1.1;margin:12px 0}p{color:var(--sub)}button,input,textarea{font:inherit}button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-height:44px;cursor:pointer}button:hover{border-color:var(--accent)}button[aria-pressed=true],.primary{background:var(--accent);color:var(--on);border-color:var(--accent)}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:28px 0 18px}.search{flex:1;min-width:200px}label{display:block;margin-bottom:6px}input,textarea{background:var(--card);color:var(--text);border:1px solid var(--line);padding:12px;border-radius:10px;width:100%;min-width:0}.filters{display:flex;gap:8px;flex-wrap:wrap}.results{margin:24px 0 14px;font-size:13px;color:var(--sub)}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:24px}.look{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}.look.selected{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.tag{font-size:12px;color:var(--accent)}h2{font-size:19px;margin:0;line-height:1.3}.look p{font-size:14px;margin:0;flex:1}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{font-size:13px}.selection{position:sticky;bottom:12px;z-index:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;box-shadow:0 6px 24px #0001}.selection p{margin:0;font-size:12px}.selection strong{font-size:17px;font-weight:500}.use{display:inline-flex;align-items:center;text-decoration:none;border-radius:10px;padding:12px 18px;min-height:44px}.use[aria-disabled=true]{pointer-events:none;opacity:.5}.note{font-size:13px}.status{min-height:24px;color:var(--accent)}#copy-fallback{margin:18px 0}textarea{min-height:100px}[hidden]{display:none!important}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){body{padding:10px}main{padding:20px}.grid{grid-template-columns:1fr}.selection .use{width:100%;justify-content:center}}
+</style>
+</head>
+<body><main>
+<nav aria-label="Studio navigation"><a href="index.html">Image Studio</a><a href="locations.html">Explore locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html" aria-current="page">World Styles</a></nav>
+<div class="eyebrow">ETHER IMAGE STUDIO · WORLD STYLES COLLECTION</div>
+<h1>A world of visual storytelling.</h1>
+<p>15 illustration and animation directions from your collection. Explore their visual language, choose a look, and blend it with any style in the studio.</p>
+<div class="toolbar"><div class="search"><label for="search">Find a world style</label><input id="search" type="search" placeholder="Try webtoon, Afrofuturist, Caribbean, pastoral…" autocomplete="off"></div><button type="button" id="surprise">Surprise me</button></div>
+<div id="filters" class="filters" role="group" aria-label="World style groups"></div>
+<div id="count" class="results" role="status" aria-live="polite"></div>
+<div id="grid" class="grid" aria-label="World style looks"></div>
+<p id="empty" hidden>No looks match. Try a different search or group.</p>
+<p class="note">Copy a description into your image prompt, or choose a look and use it in the studio. These are descriptive visual directions, not complete definitions of a culture or official national styles. Preserve your chosen character identity when applying a look. Thumbnails are original AI-generated examples. These are visual directions; still-image action cues describe one frozen moment. 3D looks produce images, not editable models.</p>
+<div id="status" class="status" role="status" aria-live="polite"></div>
+<div id="copy-fallback" hidden><label for="copy-text">Select and copy this style description</label><textarea id="copy-text" readonly></textarea></div>
+<div class="selection"><div aria-live="polite"><p>Selected look</p><strong id="selected">Choose a look</strong></div><a id="use" class="use primary" aria-disabled="true">Use in studio →</a></div>
+</main>
+<script src="world-data.js"></script>
+
+<script>
+(() => {
+  const $=id=>document.getElementById(id);
+  let group='',selected='';
+  const KEY='ether-studio-world-browser';
+  function pool(){const q=$('search').value.trim().toLowerCase();return WORLD_STYLES.filter(s=>(!group||s.category===group)&&(!q||(s.name+' '+s.description+' '+s.category).toLowerCase().includes(q)));}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify({group,selected,query:$('search').value}));}catch(e){}}
+  function choose(id){selected=id;render();save();}
+  async function copyStyle(s){
+    const text=s.name+' — '+s.description;
+    try{await navigator.clipboard.writeText(text);$('copy-fallback').hidden=true;$('status').textContent='Copied: '+s.name;}
+    catch(e){$('copy-text').value=text;$('copy-fallback').hidden=false;$('copy-text').focus();$('copy-text').select();$('status').textContent='Copy the selected description below.';}
+  }
+  function render(){
+    const categories=['',...new Set(WORLD_STYLES.map(s=>s.category))];
+    $('filters').replaceChildren(...categories.map(name=>{const b=document.createElement('button');b.type='button';b.dataset.group=name;b.setAttribute('aria-pressed',String(group===name));b.textContent=(name||'All looks')+' · '+WORLD_STYLES.filter(s=>!name||s.category===name).length;b.onclick=()=>{group=name;render();save();};return b;}));
+    const looks=pool();$('count').textContent=looks.length+(looks.length===1?' look':' looks');$('empty').hidden=!!looks.length;$('surprise').disabled=!looks.length;
+    $('grid').replaceChildren(...looks.map(s=>{
+      const card=document.createElement('article');card.className='look'+(selected===s.id?' selected':'');
+      const preview=document.createElement('span');preview.setAttribute('aria-hidden','true');decorateWorldThumbnail(preview,s);
+      const tag=document.createElement('span');tag.className='tag';tag.textContent=s.category;
+      const h=document.createElement('h2');h.textContent=s.name;const p=document.createElement('p');p.textContent=s.description;
+      const actions=document.createElement('div');actions.className='actions';
+      const pick=document.createElement('button');pick.type='button';pick.textContent=selected===s.id?'Selected':'Choose look';pick.setAttribute('aria-label','Choose '+s.name);pick.setAttribute('aria-pressed',String(selected===s.id));pick.onclick=()=>choose(s.id);
+      const copy=document.createElement('button');copy.type='button';copy.textContent='Copy description';copy.setAttribute('aria-label','Copy '+s.name+' description');copy.onclick=()=>copyStyle(s);
+      actions.append(pick,copy);card.append(preview,tag,h,p,actions);return card;
+    }));
+    const current=WORLD_STYLES.find(s=>s.id===selected);$('selected').textContent=current?current.name:'Choose a look';$('use').setAttribute('aria-disabled',String(!current));
+    if(current)$('use').href='index.html?'+new URLSearchParams({world:current.id});else $('use').removeAttribute('href');
+  }
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s){group=WORLD_STYLES.some(x=>x.category===s.group)?s.group:'';selected=WORLD_STYLES.some(x=>x.id===s.selected)?s.selected:'';if(typeof s.query==='string')$('search').value=s.query;}}catch(e){}
+  $('search').oninput=()=>{render();save();};
+  $('surprise').onclick=()=>{const p=pool();if(p.length)choose(p[Math.floor(Math.random()*p.length)].id);};
+  render();
+})();
+</script></body></html>
+
+
