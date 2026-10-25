@@ -826,12 +826,8 @@ function tileFor(s, showGroup) {
   const t = document.createElement('span');
   t.className = 'thumb'; t.setAttribute('aria-hidden', 'true');
   if (s.group === 'Ether Visions') {
-    t.style.backgroundImage = `radial-gradient(circle at 70% 25%, ${s.colors[1]}cc 0, transparent 55%), linear-gradient(160deg, ${s.colors[0]}, #050505)`;
-    t.style.backgroundSize = 'cover';
-    t.style.display = 'flex'; t.style.alignItems = 'flex-end';
-    const r = document.createElement('span'); r.textContent = s.mood;
-    r.style.cssText = 'font:600 11px/1.2 -apple-system,system-ui,sans-serif;color:#f5e6c8;padding:10px 12px;letter-spacing:.02em;text-shadow:0 1px 3px rgba(0,0,0,.7)';
-    t.append(r);
+    t.style.backgroundImage = 'none';
+    decorateThumbnail(t, 'vision', s.id);
   } else if (s.group === 'World styles') {
     decorateWorldThumbnail(t,s);
   } else if (s.group === 'Donghua & Fusion') {
@@ -1043,6 +1039,7 @@ render();
 </script>
 </body>
 </html>
+
 
 
 

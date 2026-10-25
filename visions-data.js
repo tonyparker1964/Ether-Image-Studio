@@ -1,4 +1,4 @@
-// Ether Visions: cinematic, cosmic and spiritual looks. Thumbnails are drawn as gradients until preview art is added.
+// Ether Visions: cinematic, cosmic and spiritual looks. Original previews use the 4-by-4 visions-01.webp atlas.
 const VISIONS_STYLES = [
   {id: "v1", name: "Kemet Starpilot", mood: "Afrofuturist sci-fi", colors: ["#1a120b", "#c08a3e"],
    description: "1970s sci-fi film still of Afro-Egyptian pilots in gold-embroidered robes and headdresses at glowing retro cockpit consoles, warm low-key light and analog grain"},
@@ -33,3 +33,4 @@ const VISIONS_STYLES = [
   {id: "v16", name: "Desert Oracle Film Still", mood: "Mystic cinema", colors: ["#2e2116", "#b9855a"],
    description: "1970s cinematic portraits of desert mystics in layered headscarves, gold mosaic masks and swarms of butterflies, sun-weathered skin, warm earth tones and analog film grain"}
 ].map(s => ({...s, category: s.mood, group: "Ether Visions"}));
+
