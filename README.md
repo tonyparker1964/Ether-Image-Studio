@@ -1,20 +1,17 @@
 # Ether Image Studio
 
-A browser-based creative dashboard with 30 image styles, 12 3D looks, and blends of exactly 2, 3, or 4 styles. Includes visual examples, custom blend weights, cinematic direction, and prompt copying. Settings stay in your browser.
+[Open Ether Image Studio](https://tonyparker1964.github.io/Ether-Image-Studio/)
 
-## Run locally
+Explore 30 image styles and 12 3D looks with visual examples. Choose one style or blend exactly 2, 3, or 4. Adjust blend weights, composition, framing, lighting, and cinematic direction. Settings stay in your browser.
 
-Run `python3 -m http.server 8000` in this folder and open http://localhost:8000.
+## Create an image
 
-## Publish on GitHub Pages
+1. Choose your styles and describe your scene.
+2. Build and copy your image request.
+3. Paste the request into ChatGPT to generate the image. Attach any character reference images there.
 
-1. Create a repository named `ether-image-studio`.
-2. Upload `index.html` and `.nojekyll` to the repository root.
-3. In repository Settings → Pages, choose Deploy from a branch, select `main` and `/ (root)`, and save.
-4. GitHub provides the published URL after deployment.
+This public website builds prompts; it does not call an image API or contain API keys. Style thumbnails are illustrative AI-generated examples. 3D looks produce raster image aesthetics, not editable 3D models.
 
-## Image generation
+## Hosting
 
-This static version builds prompts. Copy a prompt into ChatGPT or another image generator to create the image. It does not call an image API or include API keys. Direct generation requires a separately hosted backend that keeps credentials on the server.
-
-Style thumbnails are illustrative AI-generated examples. 3D looks produce image aesthetics, not editable meshes.
+Published through GitHub Pages from the main branch, repository root.
