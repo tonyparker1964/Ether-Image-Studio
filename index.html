@@ -116,6 +116,28 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-card);border
 
   <h2>Characters</h2>
   <div class="panel">
+    <label for="es-character">Scene character</label>
+    <select id="es-character">
+      <option value="">Use my scene description</option>
+      <optgroup label="People">
+        <option value="boy">Boy explorer</option><option value="girl">Girl explorer</option>
+        <option value="man">Adult man</option><option value="woman">Adult woman</option>
+        <option value="elder-man">Elder man</option><option value="elder-woman">Elder woman</option>
+      </optgroup>
+      <optgroup label="Imaginative companions">
+        <option value="tiger">Tiger</option><option value="fox">Fox</option>
+        <option value="robot">Robot</option><option value="fantasy">Fantasy guardian</option>
+      </optgroup>
+      <option value="custom">Custom character</option>
+    </select>
+    <div id="es-character-options" class="hidden">
+      <label for="es-character-look">Character appearance</label>
+      <textarea id="es-character-look" style="min-height:70px" placeholder="Describe their age, skin tone, hair, clothing, markings, and personality…"></textarea>
+      <label class="check"><input type="checkbox" id="es-character-ref"> I'm attaching this character's reference sheet</label>
+      <p class="note">Edit any preset to match your character. Attach reference images in your image tool.</p>
+    </div>
+  </div>
+  <div class="panel">
     <label class="check"><input type="checkbox" id="es-ether"> Include Ether</label>
     <label class="check sub-check" id="es-ether-ref-wrap"><input type="checkbox" id="es-ether-ref"> I'm attaching Ether's character sheet</label>
     <label class="check"><input type="checkbox" id="es-element"> Include Element</label>
@@ -298,6 +320,20 @@ const LOCATIONS = {
 
 const MONO = new Set(['i8', 'i10', 'i23', 'd12']);
 
+const CHARACTER_PRESETS = {
+  boy: {name: 'Boy explorer', look: 'A young Black boy explorer with warm brown skin, short curly hair, a teal jacket, and a curious, fearless spirit'},
+  girl: {name: 'Girl explorer', look: 'A young Black girl explorer with warm brown skin, natural hair in two puffs, a golden-yellow jacket, and a curious, adventurous spirit'},
+  man: {name: 'Adult man', look: 'An adult Black man with deep brown skin, short natural hair, an indigo jacket, and a calm, confident presence'},
+  woman: {name: 'Adult woman', look: 'An adult Black woman with deep brown skin, natural curls, an emerald outfit, and a confident, creative presence'},
+  'elder-man': {name: 'Elder man', look: 'An elder Black man with rich brown skin, silver hair and beard, an earth-toned robe, and a thoughtful, warm expression'},
+  'elder-woman': {name: 'Elder woman', look: 'An elder Black woman with rich brown skin, silver natural curls, a patterned indigo shawl, and a wise, warm expression'},
+  tiger: {name: 'Tiger', look: 'An expressive tiger with orange fur, recognizable black stripes, bright amber eyes, and a curious, courageous presence'},
+  fox: {name: 'Fox explorer', look: 'An expressive red fox explorer with russet fur, a white muzzle, dark paws, a teal scarf, and a small satchel'},
+  robot: {name: 'Robot companion', look: 'A friendly original robot with rounded brass and teal panels, expressive luminous eyes, articulated limbs, and a curious personality'},
+  fantasy: {name: 'Fantasy guardian', look: 'An original celestial guardian with an expressive face, midnight-indigo robes, fine gold accents, and a gentle luminous aura'},
+  custom: {name: 'Custom character', look: ''}
+};
+
 const STARTER = {
   etherLook: "Ether, a young explorer with a curious, fearless spirit",
   elementLook: "Element, Ether's tiger companion: a large, gentle, loyal tiger whose form changes with the world around them",
@@ -309,9 +345,9 @@ const STARTER = {
   }
 };
 const DEFAULTS = {1: [100], 2: [60, 40], 3: [50, 30, 20], 4: [40, 30, 20, 10]};
-const FIELDS = ['mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
+const FIELDS = ['character','character-look','mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
   'form','ether-look','element-look','cue-earth','cue-water','cue-fire','cue-air','vtool','duration','cam','pace','action'];
-const CHECKS = ['ether','ether-ref','element','element-ref'];
+const CHECKS = ['character-ref','ether','ether-ref','element','element-ref'];
 
 let group = 'Image styles', selected = ['i8'], weights = [100];
 
@@ -420,6 +456,10 @@ function location() {
 }
 function characters() {
   const list = [];
+  const preset = CHARACTER_PRESETS[$('character').value];
+  if (preset && clean($('character-look').value)) {
+    list.push({name: preset.name, text: clean($('character-look').value), ref: $('character-ref').checked});
+  }
   if ($('ether').checked) list.push({name: 'Ether', text: clean($('ether-look').value) || 'Ether', ref: $('ether-ref').checked});
   if ($('element').checked) list.push({name: 'Element', text: (clean($('element-look').value) || 'Element') + ', shown ' + elementForm(), ref: $('element-ref').checked});
   return list;
@@ -529,6 +569,7 @@ function problem() {
   if (selected.length !== max) return `Choose ${max} style${max === 1 ? '' : 's'} for this mode (${selected.length} selected).`;
   if (weights.some(w => !Number.isFinite(w) || w <= 0 || w > 100) || Math.abs(total() - 100) > 0.01) return `Style weights must be positive and total 100% (now ${total()}%).`;
   if (!$('scene').value.trim()) return 'Describe your scene to continue.';
+  if ($('character').value && !$('character-look').value.trim()) return 'Describe your selected character to continue.';
   if ($('element').checked && $('form').value === 'blend' && $('blend').querySelectorAll('input:checked').length < 2) return 'Pick at least two elements for Element\'s blended form.';
   return '';
 }
@@ -599,6 +640,7 @@ function renderTotal() {
   $('total').className = 'total ' + (ok ? 'good' : 'bad');
 }
 function renderCharacters() {
+  $('character-options').classList.toggle('hidden', !$('character').value);
   $('ether-ref-wrap').classList.toggle('hidden', !$('ether').checked);
   $('element-opts').classList.toggle('hidden', !$('element').checked);
   $('blend').classList.toggle('hidden', $('form').value !== 'blend');
@@ -614,6 +656,12 @@ function renderOutputs() {
 function render() { renderGrid(); renderSelection(); renderCharacters(); renderOutputs(); }
 
 // ---------- events ----------
+$('character').addEventListener('change', () => {
+  const preset = CHARACTER_PRESETS[$('character').value];
+  $('character-look').value = preset ? preset.look : '';
+  $('character-ref').checked = false;
+  renderCharacters(); renderOutputs(); save();
+});
 $('images').onclick = () => { group = 'Image styles'; $('search').value = ''; render(); save(); };
 $('three').onclick = () => { group = '3D looks'; $('search').value = ''; render(); save(); };
 $('search').oninput = renderGrid;
@@ -657,3 +705,4 @@ render();
 </script>
 </body>
 </html>
+
