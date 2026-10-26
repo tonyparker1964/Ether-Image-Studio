@@ -7,7 +7,7 @@ Explore 146 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 don
 ## Pages
 
 - **Image Studio** (`index.html`) builds the prompts.
-- **Characters** (`characters.html`) is your saved cast. Build a character sheet (name, heritage, skin, hair, eyes, outfit, signature items, palette, personality), add up to 6 reference images, copy a turnaround reference-sheet prompt, and send the character to the studio. Saved in your browser; **Export all** makes a backup file and **Import** restores it on any device.
+- **Characters** (`characters.html`) is your saved cast. Build a character sheet (name, heritage, skin, hair, eyes, outfit, signature items, palette, personality), add a reference sheet plus up to 5 more images (drag and drop or paste; the first is the main sheet), copy a turnaround reference-sheet prompt, and send the character to the studio. Saved in your browser; **Export all** makes a backup file and **Import** restores it on any device.
 - **Explore locations** (`locations.html`) browses all 570 locations with previews, search and categories, then sends your pick to the studio.
 - **Japanese Anime** (`anime.html`) browses the 33 anime looks by era, genre and visual approach, then sends your pick to the studio.
 
@@ -21,6 +21,7 @@ Explore 146 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 don
    - **Scene character:** 140+ presets in 11 groups (people, adventure and action, fantasy people, sci-fi and future, everyday and modern, music dance and sports, myth and spirit, animals, fantasy creatures, robots and tech, companions), with a search box, or your own. People presets take on the heritage you pick; animals, creatures and robots are fixed original designs. Edit any description to match your character.
    - **Ether and Element:** pick Element's form (tiger, earth, water, fire, air or a blend). Edit both under "Edit character looks".
    - **My characters** at the top of the Scene character menu lists your saved sheets (📎 means it has reference images). **💾 Save to My characters** saves whatever character is in the studio.
+   - **Reference sheets:** the scene character, Ether and Element each have a **+ Add reference sheet** slot (tap, drag and drop, or paste). Adding one ticks the reference box; **Copy image** or **Download** it to attach in your image tool. A saved character's sheet is shared with the Characters page.
    - Tick the reference box for any character whose sheet you're attaching.
 4. Pick your image tool:
    - **ChatGPT / Gemini** gives a structured natural-language prompt.

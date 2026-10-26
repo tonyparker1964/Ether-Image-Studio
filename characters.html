@@ -67,7 +67,12 @@ button:hover{background:color-mix(in srgb,var(--es-field) 80%,var(--es-text) 8%)
 .ref img{width:100%;height:100%;object-fit:cover;display:block}
 .ref button{position:absolute;top:6px;right:6px;min-height:28px;padding:2px 9px;font-size:12px;background:rgba(0,0,0,.6);color:#fff}
 .ref-add{display:grid;place-items:center;aspect-ratio:1;border-radius:12px;border:2px dashed var(--es-line);color:var(--es-sub);font-size:13px;text-align:center;cursor:pointer;padding:8px}
-.ref-add:hover{border-color:var(--es-accent);color:var(--es-accent)}
+.ref-add:hover,.sheetbox.over .ref-add{border-color:var(--es-accent);color:var(--es-accent)}
+.sheetbox{background:var(--es-field);border-radius:16px;padding:14px 16px 16px;margin-top:16px}
+.sheetbox .ref-add{background:var(--es-card)}
+.ref .tag{position:absolute;left:6px;bottom:6px;font-size:11px;font-weight:600;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:2px 7px}
+.ref img{cursor:zoom-in}
+.refview{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:20px;cursor:zoom-out}.refview img{max-width:100%;max-height:100%;border-radius:12px}
 pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);padding:14px;border-radius:12px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0;max-height:360px;overflow:auto}
 .status{min-height:22px;font-size:14px;color:var(--es-accent);margin:10px 0 0}
 .savebar{position:sticky;bottom:12px;margin-top:22px;background:var(--es-glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:18px;padding:10px;box-shadow:var(--es-shadow);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -118,6 +123,12 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);paddi
       <span class="note" id="saved-at"></span>
     </div>
 
+    <div class="sheetbox" id="sheetbox">
+      <h3 style="margin-top:6px">Reference sheet</h3>
+      <p class="note" style="margin:2px 0 0">Add your character sheet first: drop it here, tap to choose, or paste it. Add up to 5 more images (portrait, full body, outfit details). The first image is the main sheet.</p>
+      <div class="refs" id="refs"></div>
+      <input type="file" id="ref-input" accept="image/*" multiple class="hidden">
+    </div>
     <div class="grid2">
       <div><label for="f-name">Name</label><input id="f-name" maxlength="80" placeholder="e.g. Kofi" autocomplete="off"></div>
       <div><label for="f-kind">Type</label><select id="f-kind"><option value="person">Person</option><option value="creature">Animal, creature or robot</option></select></div>
@@ -174,12 +185,6 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);paddi
       <div class="row" style="margin-top:8px"><button type="button" class="chip hidden" id="rebuild">Rebuild from fields</button><span class="note" id="desc-mode"></span></div>
     </div>
 
-    <div class="section">
-      <h3>Reference images</h3>
-      <p class="note" style="margin:2px 0 0">Add up to 6 images: a finished character sheet, a portrait, a full-body pose. Attach them in your image tool along with the prompt.</p>
-      <div class="refs" id="refs"></div>
-      <input type="file" id="ref-input" accept="image/*" multiple class="hidden">
-    </div>
 
     <div class="section">
       <h3>Make a character sheet</h3>
@@ -311,20 +316,30 @@ function renderRefs() {
     const img = document.createElement('img'); img.src = src; img.alt = `Reference ${i + 1}`;
     const x = document.createElement('button'); x.type = 'button'; x.textContent = 'Remove'; x.setAttribute('aria-label', `Remove reference ${i + 1}`);
     x.onclick = () => { images.splice(i, 1); dirty = true; renderRefs(); };
-    d.append(img, x); return d;
+    img.onclick = () => { const v = document.createElement('div'); v.className = 'refview'; const big = document.createElement('img'); big.src = src; big.alt = img.alt; v.append(big); v.onclick = () => v.remove(); document.body.append(v); };
+    d.append(img, x);
+    if (i === 0) { const t = document.createElement('span'); t.className = 'tag'; t.textContent = 'Main sheet'; d.append(t); }
+    else { const m = document.createElement('button'); m.type = 'button'; m.textContent = 'Make main'; m.style.cssText = 'top:auto;bottom:6px;right:auto;left:6px'; m.onclick = () => { images.unshift(images.splice(i, 1)[0]); dirty = true; renderRefs(); }; d.append(m); }
+    return d;
   });
   if (images.length < 6) {
-    const add = document.createElement('button'); add.type = 'button'; add.className = 'ref-add'; add.textContent = '+ Add image';
+    const add = document.createElement('button'); add.type = 'button'; add.className = 'ref-add'; add.textContent = images.length ? '+ Add image' : '+ Add reference sheet';
     add.onclick = () => $('ref-input').click(); nodes.push(add);
   }
   $('refs').replaceChildren(...nodes);
 }
-$('ref-input').onchange = async e => {
-  const files = [...e.target.files].slice(0, 6 - images.length);
-  for (const f of files) { try { images.push(await S.shrink(f)); } catch (err) { status(err.message); } }
-  e.target.value = ''; dirty = true; renderRefs();
-  if (files.length) status('Image added. Save to keep it.');
-};
+async function addFiles(list) {
+  const files = [...list].filter(f => f.type.startsWith('image/')).slice(0, 6 - images.length);
+  if (!files.length) { status(images.length >= 6 ? 'Up to 6 images per character. Remove one first.' : 'That isn\'t an image file.'); return; }
+  for (const f of files) { try { images.push(await S.shrink(f, 1600)); } catch (err) { status(err.message); } }
+  dirty = true; renderRefs(); status('Image added. Save to keep it.');
+}
+const box = $('sheetbox');
+box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('over'); });
+box.addEventListener('dragleave', () => box.classList.remove('over'));
+box.addEventListener('drop', e => { e.preventDefault(); box.classList.remove('over'); addFiles(e.dataTransfer.files); });
+addEventListener('paste', e => { const f = [...(e.clipboardData?.files || [])].filter(x => x.type.startsWith('image/')); if (f.length) { e.preventDefault(); addFiles(f); } });
+$('ref-input').onchange = async e => { const files = [...e.target.files]; e.target.value = ''; if (files.length) addFiles(files); };
 
 // ---------- library ----------
 function renderList() {

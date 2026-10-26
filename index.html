@@ -173,6 +173,16 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
 }
 @media(max-width:380px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.controls,.mini{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+/* reference sheet slots */
+.refslot{display:flex;gap:12px;align-items:center;margin:4px 0 10px;flex-wrap:wrap}
+.refslot .drop{display:grid;place-items:center;width:96px;height:72px;border-radius:12px;border:2px dashed var(--es-line);color:var(--es-sub);font-size:12px;line-height:1.3;text-align:center;cursor:pointer;padding:6px;background:transparent;min-height:0;flex:none}
+.refslot .drop:hover,.refslot .drop.over{border-color:var(--es-accent);color:var(--es-accent)}
+.refslot img{width:96px;height:72px;object-fit:cover;border-radius:12px;display:block;flex:none;cursor:zoom-in;box-shadow:inset 0 0 0 1px var(--es-line)}
+.refslot .acts{display:flex;gap:6px;flex-wrap:wrap}
+.refslot .acts button{font-size:13px;min-height:32px;padding:5px 12px;background:var(--es-card);box-shadow:inset 0 0 0 1px var(--es-line)}
+.refslot .hint{font-size:12px;color:var(--es-sub);flex-basis:100%;margin:0}
+.refview{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:20px;cursor:zoom-out}
+.refview img{max-width:100%;max-height:100%;border-radius:12px}
 </style>
 </head>
 <body>
@@ -291,6 +301,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
       <label for="es-character-look">Character appearance</label>
       <textarea id="es-character-look" style="min-height:70px" placeholder="Describe their age, skin tone, hair, clothing, markings, and personality…"></textarea>
       <label class="check"><input type="checkbox" id="es-character-ref"> I'm attaching this character's reference sheet</label>
+      <div class="refslot" data-slot="scene"></div>
       <div class="row" style="margin-top:6px">
         <a id="es-edit-sheet" class="hidden" href="characters.html">Edit this character's sheet →</a>
         <button type="button" id="es-save-char" class="chip">💾 Save to My characters</button>
@@ -304,7 +315,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
   </div>
   <div class="panel">
     <label class="check"><input type="checkbox" id="es-ether"> Include Ether</label>
-    <label class="check sub-check" id="es-ether-ref-wrap"><input type="checkbox" id="es-ether-ref"> I'm attaching Ether's character sheet</label>
+    <div class="sub-check" id="es-ether-ref-wrap"><label class="check"><input type="checkbox" id="es-ether-ref"> I'm attaching Ether's character sheet</label><div class="refslot" data-slot="ether"></div></div>
     <label class="check"><input type="checkbox" id="es-element"> Include Element</label>
     <div id="es-element-opts" class="sub-check" style="margin-left:30px">
       <label for="es-form" style="margin-top:4px">Element's form</label>
@@ -318,6 +329,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
         <label class="check" style="margin:0"><input type="checkbox" value="air"> Air</label>
       </div>
       <label class="check" style="margin-top:10px"><input type="checkbox" id="es-element-ref"> I'm attaching Element's character sheet</label>
+      <div class="refslot" data-slot="element"></div>
     </div>
     <details>
       <summary>Edit character looks</summary>
@@ -1337,6 +1349,95 @@ buildCharacterMenu('');
 buildLocations('');
 restore();
 fillStarterLooks(false);
+// ---------- reference sheet slots ----------
+// Scene character: a saved character's own images, otherwise a studio slot. Ether and Element have their own slots.
+const SLOT_CHECK = {scene: 'character-ref', ether: 'ether-ref', element: 'element-ref'};
+function slotKey(slot) {
+  if (slot !== 'scene') return 'studio:' + slot;
+  const p = CHARACTER_PRESETS[$('character').value];
+  return p && p.mine ? p.id : 'studio:scene:' + ($('character').value || 'none');
+}
+async function slotImages(slot) { return CharacterStore.getImages(slotKey(slot)); }
+async function setSlotImage(slot, dataUrl) {
+  const key = slotKey(slot), p = CHARACTER_PRESETS[$('character').value], mineSlot = slot === 'scene' && p && p.mine;
+  let imgs = await CharacterStore.getImages(key);
+  imgs = dataUrl ? [dataUrl, ...imgs.filter(i => i !== dataUrl)].slice(0, 6) : imgs.slice(1);
+  await CharacterStore.setImages(key, imgs);
+  if (mineSlot) { // keep the saved character's count and avatar in sync
+    const c = CharacterStore.get(p.id);
+    if (c) { try { CharacterStore.upsert({...c, refs: imgs.length, thumb: imgs[0] ? await squareThumb(imgs[0]) : ''}); } catch (e) {} }
+    buildCharacterMenu($('character').value);
+  }
+  $(SLOT_CHECK[slot]).checked = imgs.length > 0;
+  renderOutputs(); save(); renderSlot(slot);
+}
+function squareThumb(src) {
+  return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => {
+    const s = Math.min(img.width, img.height), c = document.createElement('canvas'); c.width = c.height = 96;
+    c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 96, 96); resolve(c.toDataURL('image/jpeg', .8)); };
+    img.onerror = reject; img.src = src; });
+}
+async function addSlotFile(slot, file) {
+  if (!file || !file.type.startsWith('image/')) { $('status').textContent = 'That isn\'t an image file.'; return; }
+  try { await setSlotImage(slot, await CharacterStore.shrink(file, 1600)); $('status').textContent = 'Reference sheet added. Attach it in your image tool with the prompt.'; }
+  catch (e) { $('status').textContent = 'Couldn\'t save that image in this browser.'; }
+}
+async function renderSlot(slot) {
+  const box = document.querySelector(`.refslot[data-slot="${slot}"]`); if (!box) return;
+  const want = slotKey(slot); box.dataset.key = want;
+  const imgs = await slotImages(slot);
+  if (box.dataset.key !== want) return; // selection changed while loading
+  if (imgs[0] && box.dataset.ticked !== want) { box.dataset.ticked = want; if (!$(SLOT_CHECK[slot]).checked) { $(SLOT_CHECK[slot]).checked = true; renderOutputs(); } }
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.hidden = true;
+  input.onchange = () => { addSlotFile(slot, input.files[0]); input.value = ''; };
+  const nodes = [input];
+  if (imgs[0]) {
+    const img = document.createElement('img'); img.src = imgs[0]; img.alt = 'Reference sheet'; img.title = 'View full size';
+    img.onclick = () => { const v = document.createElement('div'); v.className = 'refview'; const big = document.createElement('img'); big.src = imgs[0]; big.alt = 'Reference sheet'; v.append(big); v.onclick = () => v.remove(); document.body.append(v); };
+    const acts = document.createElement('div'); acts.className = 'acts';
+    const b = (t, fn) => { const x = document.createElement('button'); x.type = 'button'; x.textContent = t; x.onclick = fn; acts.append(x); };
+    b('Copy image', () => copyImage(imgs[0]));
+    b('Download', () => { const a = document.createElement('a'); a.href = imgs[0]; a.download = (slot === 'scene' ? (CHARACTER_PRESETS[$('character').value]?.name || 'character') : slot) + '-reference-sheet.jpg'; document.body.append(a); a.click(); a.remove(); });
+    b('Replace', () => input.click());
+    b('Remove', () => setSlotImage(slot, null));
+    const hint = document.createElement('p'); hint.className = 'hint'; hint.textContent = 'Copy or download it, then attach it in ChatGPT, Gemini or Midjourney along with the prompt.' + (imgs.length > 1 ? ` (${imgs.length} images saved; the first is shown.)` : '');
+    nodes.push(img, acts, hint);
+  } else {
+    const drop = document.createElement('button'); drop.type = 'button'; drop.className = 'drop'; drop.textContent = '+ Add reference sheet';
+    drop.onclick = () => input.click();
+    const hint = document.createElement('p'); hint.className = 'hint'; hint.style.flexBasis = 'auto'; hint.style.flex = '1'; hint.textContent = 'Tap, drop an image here, or paste one. Saved in this browser.';
+    nodes.push(drop, hint);
+  }
+  box.replaceChildren(...nodes);
+}
+async function copyImage(src) {
+  try {
+    const img = new Image(); img.src = src; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0);
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    $('status').textContent = 'Image copied. Paste it into your image tool.';
+  } catch (e) { $('status').textContent = 'This browser won\'t copy images. Use Download instead.'; }
+}
+document.querySelectorAll('.refslot').forEach(box => {
+  const slot = box.dataset.slot;
+  box.addEventListener('dragover', e => { e.preventDefault(); box.querySelector('.drop')?.classList.add('over'); });
+  box.addEventListener('dragleave', () => box.querySelector('.drop')?.classList.remove('over'));
+  box.addEventListener('drop', e => { e.preventDefault(); box.querySelector('.drop')?.classList.remove('over'); addSlotFile(slot, e.dataTransfer.files[0]); });
+});
+// Paste an image anywhere in the Cast section to add it to the slot that's showing
+let lastSlot = 'scene';
+document.querySelectorAll('.refslot').forEach(box => box.addEventListener('pointerdown', () => lastSlot = box.dataset.slot));
+addEventListener('paste', e => {
+  const file = [...(e.clipboardData?.files || [])].find(f => f.type.startsWith('image/'));
+  if (!file) return;
+  const visible = s => { const b = document.querySelector(`.refslot[data-slot="${s}"]`); return b && b.offsetParent !== null; };
+  const slot = visible(lastSlot) ? lastSlot : ['scene', 'ether', 'element'].find(visible);
+  if (slot) { e.preventDefault(); addSlotFile(slot, file); }
+});
+$('character').addEventListener('change', () => { document.querySelector('.refslot[data-slot="scene"]').dataset.ticked = ''; renderSlot('scene'); });
+['scene', 'ether', 'element'].forEach(renderSlot);
+
 const locationParams = new URLSearchParams(window.location.search);
 if (locationParams.has('char')) {
   const key = 'my:' + locationParams.get('char');
