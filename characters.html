@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Character Sheets · Ether Image Studio</title>
+<meta name="description" content="Create and save character sheets, generate a turnaround reference-sheet prompt, and cast your characters in Ether Image Studio.">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2311101b'/%3E%3Cpath d='M32 9c2 13 10 21 23 23-13 2-21 10-23 23-2-13-10-21-23-23 13-2 21-10 23-23z' fill='%23d2b3ff'/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light dark;
+  --es-page:#f5f5f7;--es-card:#fff;--es-field:#f5f5f7;--es-text:#1d1d1f;--es-sub:#6e6e73;--es-line:#d2d2d7;
+  --es-accent:#0071e3;--es-accent-hover:#0077ed;--es-on-accent:#fff;--es-warn:#d70015;--es-ok:#248a3d;
+  --es-glass:rgba(251,251,253,.78);--es-shadow:0 2px 6px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06);
+  --es-grad:linear-gradient(100deg,#7b3fe4 0%,#0071e3 45%,#e0508f 100%);
+}
+@media (prefers-color-scheme:dark){:root{
+  --es-page:#000;--es-card:#1c1c1e;--es-field:#2c2c2e;--es-text:#f5f5f7;--es-sub:#a1a1a6;--es-line:#38383a;
+  --es-accent:#2997ff;--es-accent-hover:#47a5ff;--es-warn:#ff6961;--es-ok:#30d158;
+  --es-glass:rgba(22,22,23,.72);--es-shadow:0 0 0 1px rgba(255,255,255,.04);
+  --es-grad:linear-gradient(100deg,#b388ff 0%,#2997ff 45%,#ff7eb3 100%);
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--es-page);color:var(--es-text);font:17px/1.47 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+a{color:var(--es-accent);text-decoration:none}a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit;color:var(--es-text);letter-spacing:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--es-accent) 55%,transparent);outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:50;background:var(--es-glass);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid color-mix(in srgb,var(--es-line) 60%,transparent)}
+.topbar-in{max-width:1280px;margin:auto;height:52px;display:flex;align-items:center;gap:24px;padding:0 22px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px;color:var(--es-text);white-space:nowrap}.brand:hover{text-decoration:none}.brand svg{width:22px;height:22px}
+.topnav{display:flex;gap:22px;margin-left:auto;overflow-x:auto;scrollbar-width:none}.topnav::-webkit-scrollbar{display:none}
+.topnav a{color:var(--es-sub);font-size:13px;white-space:nowrap;padding:4px 0}.topnav a:hover{color:var(--es-text);text-decoration:none}.topnav a[aria-current]{color:var(--es-text)}
+.hero{text-align:center;padding:56px 22px 28px;max-width:900px;margin:auto}
+.eyebrow{font-size:14px;font-weight:600;color:var(--es-sub);letter-spacing:.02em;margin-bottom:10px}
+h1{font-size:clamp(38px,6vw,68px);line-height:1.05;letter-spacing:-.035em;font-weight:700;margin:0 0 14px;background:var(--es-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(18px,2vw,22px);line-height:1.35;color:var(--es-sub);margin:0 auto;max-width:680px}
+main{max-width:1280px;margin:auto;padding:0 22px 80px;display:grid;grid-template-columns:330px minmax(0,1fr);gap:24px;align-items:start}
+.card{background:var(--es-card);border-radius:22px;padding:24px;box-shadow:var(--es-shadow)}
+.library{position:sticky;top:68px}
+h2{font-size:24px;line-height:1.15;letter-spacing:-.02em;margin:0}
+h3{font-size:17px;margin:22px 0 2px}
+.note{font-size:13px;line-height:1.45;color:var(--es-sub)}
+label{display:block;margin:14px 0 6px;font-size:14px;font-weight:500}
+input,select,textarea{width:100%;background:var(--es-field);border:1px solid transparent;padding:11px 13px;border-radius:12px;min-width:0}
+input:focus,select:focus,textarea:focus{border-color:var(--es-accent);outline:none;background:var(--es-card)}
+textarea{min-height:84px;resize:vertical}
+button{background:var(--es-field);border:0;border-radius:980px;padding:10px 18px;min-height:44px;cursor:pointer;font-size:15px}
+button:hover{background:color-mix(in srgb,var(--es-field) 80%,var(--es-text) 8%)}
+.primary{background:var(--es-accent);color:var(--es-on-accent);font-weight:500}.primary:hover{background:var(--es-accent-hover)}
+.danger{color:var(--es-warn)}
+.chip{font-size:14px;min-height:36px;padding:7px 14px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 14px}
+.list{display:flex;flex-direction:column;gap:8px;margin:14px 0;max-height:calc(100vh - 330px);overflow:auto;padding:2px}
+.item{display:flex;gap:12px;align-items:center;text-align:left;border-radius:14px;padding:8px;background:var(--es-field);min-height:64px;width:100%}
+.item[aria-current=true]{box-shadow:inset 0 0 0 2px var(--es-accent);background:var(--es-card)}
+.avatar{width:48px;height:48px;border-radius:12px;flex:none;background:var(--es-grad) center/cover;display:grid;place-items:center;color:#fff;font-weight:700;font-size:19px}
+.item b{display:block;font-size:15px;font-weight:600;line-height:1.25}
+.item small{display:block;font-size:12px;color:var(--es-sub);line-height:1.3}
+.empty{padding:18px 6px;text-align:center}
+.section{border-top:1px solid var(--es-line);margin-top:22px;padding-top:4px}
+.refs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+.ref{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--es-field)}
+.ref img{width:100%;height:100%;object-fit:cover;display:block}
+.ref button{position:absolute;top:6px;right:6px;min-height:28px;padding:2px 9px;font-size:12px;background:rgba(0,0,0,.6);color:#fff}
+.ref-add{display:grid;place-items:center;aspect-ratio:1;border-radius:12px;border:2px dashed var(--es-line);color:var(--es-sub);font-size:13px;text-align:center;cursor:pointer;padding:8px}
+.ref-add:hover{border-color:var(--es-accent);color:var(--es-accent)}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);padding:14px;border-radius:12px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;margin:8px 0;max-height:360px;overflow:auto}
+.status{min-height:22px;font-size:14px;color:var(--es-accent);margin:10px 0 0}
+.savebar{position:sticky;bottom:12px;margin-top:22px;background:var(--es-glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:18px;padding:10px;box-shadow:var(--es-shadow);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.savebar .status{margin:0 6px;flex:1;min-width:140px}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:900px){main{grid-template-columns:1fr}.library{position:static}.list{max-height:none}}
+@media(max-width:600px){.topbar-in{padding:0 14px;gap:14px}.brand span{display:none}main{padding:0 12px 60px}.card{padding:18px;border-radius:18px}.grid2,.grid3{grid-template-columns:1fr}.refs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html" aria-label="Ether Image Studio home">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="eg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b3fe4"/><stop offset=".5" stop-color="#0071e3"/><stop offset="1" stop-color="#e0508f"/></linearGradient></defs><path d="M32 4c2.6 16.4 11.6 25.4 28 28-16.4 2.6-25.4 11.6-28 28C29.4 43.6 20.4 34.6 4 32c16.4-2.6 25.4-11.6 28-28z" fill="url(#eg)"/></svg>
+      <span>Ether Image Studio</span>
+    </a>
+    <nav class="topnav" aria-label="Studio navigation"><a href="index.html">Studio</a><a href="characters.html" aria-current="page">Characters</a><a href="locations.html">Locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">CHARACTER SHEETS</div>
+  <h1>Your cast, kept consistent.</h1>
+  <p class="lede">Build a character once. Save their look, make a turnaround reference sheet, and cast them in any scene.</p>
+</section>
+
+<main>
+  <aside class="card library" aria-labelledby="lib-h">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="lib-h">My characters</h2>
+      <button type="button" class="primary chip" id="new">+ New</button>
+    </div>
+    <input id="search" type="search" placeholder="Search your characters" aria-label="Search your characters" style="margin-top:14px">
+    <div id="list" class="list" aria-label="Saved characters"></div>
+    <div class="row">
+      <button type="button" class="chip" id="export">Export all</button>
+      <button type="button" class="chip" id="import-btn">Import</button>
+      <input type="file" id="import" accept="application/json,.json" class="hidden">
+      <button type="button" class="chip" id="seed">Add Ether &amp; Element</button>
+    </div>
+    <p class="note" style="margin:10px 0 0">Saved in this browser. Export a backup file to keep your cast safe or move it to another device.</p>
+  </aside>
+
+  <section class="card" aria-labelledby="ed-h">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="ed-h">New character</h2>
+      <span class="note" id="saved-at"></span>
+    </div>
+
+    <div class="grid2">
+      <div><label for="f-name">Name</label><input id="f-name" maxlength="80" placeholder="e.g. Kofi" autocomplete="off"></div>
+      <div><label for="f-kind">Type</label><select id="f-kind"><option value="person">Person</option><option value="creature">Animal, creature or robot</option></select></div>
+    </div>
+    <div class="grid2">
+      <div><label for="f-role">Role or archetype</label><input id="f-role" list="roles" maxlength="80" placeholder="e.g. young explorer, DJ, warrior queen"></div>
+      <div class="person"><label for="f-age">Age</label><input id="f-age" list="ages" maxlength="40" placeholder="e.g. young, teenage, elder"></div>
+    </div>
+    <datalist id="roles"><option>young explorer</option><option>astronaut</option><option>knight</option><option>warrior queen</option><option>wizard</option><option>DJ</option><option>rapper</option><option>detective</option><option>cyberpunk hacker</option><option>scientist</option><option>skateboarder</option><option>griot storyteller</option><option>tiger companion</option><option>robot companion</option><option>dragon</option></datalist>
+    <datalist id="ages"><option>young</option><option>teenage</option><option>young adult</option><option>adult</option><option>middle-aged</option><option>elder</option></datalist>
+
+    <div class="person">
+      <div class="grid2">
+        <div><label for="f-heritage">Heritage</label><select id="f-heritage"></select></div>
+        <div><label for="f-pronouns">Pronouns · optional</label><input id="f-pronouns" maxlength="30" placeholder="e.g. he/him"></div>
+      </div>
+      <div id="heritage-other-wrap" class="hidden"><label for="f-heritage-other">Describe heritage</label><input id="f-heritage-other" maxlength="80"></div>
+      <h3>Appearance</h3>
+      <div class="grid2">
+        <div><label for="f-skin">Skin tone</label><input id="f-skin" list="skins" maxlength="60" placeholder="e.g. deep brown skin"></div>
+        <div><label for="f-eyes">Eyes</label><input id="f-eyes" list="eyes" maxlength="60" placeholder="e.g. warm brown eyes"></div>
+      </div>
+      <datalist id="skins"><option>fair skin</option><option>light skin</option><option>light olive skin</option><option>warm tan skin</option><option>light brown skin</option><option>warm brown skin</option><option>rich medium-brown skin</option><option>deep brown skin</option><option>dark brown skin</option><option>very deep, dark skin</option></datalist>
+      <datalist id="eyes"><option>dark brown eyes</option><option>warm brown eyes</option><option>hazel eyes</option><option>green eyes</option><option>blue eyes</option><option>gray eyes</option><option>amber eyes</option></datalist>
+      <label for="f-hair">Hair</label>
+      <input id="f-hair" list="hairs" maxlength="120" placeholder="e.g. shoulder-length black dreadlocks with gold cuffs">
+      <datalist id="hairs"><option>short dreadlocks</option><option>shoulder-length dreadlocks</option><option>long dreadlocks with gold cuffs</option><option>box braids</option><option>cornrows</option><option>a rounded afro</option><option>two-strand twists</option><option>Bantu knots</option><option>a high puff</option><option>short coily hair with a fade</option><option>natural curls</option><option>long straight hair</option><option>wavy hair tied back</option><option>a shaved head</option></datalist>
+      <div class="grid2">
+        <div><label for="f-build">Build</label><input id="f-build" maxlength="60" placeholder="e.g. tall and lanky"></div>
+        <div><label for="f-face">Face and marks</label><input id="f-face" maxlength="100" placeholder="e.g. dimples, a small scar on one brow"></div>
+      </div>
+    </div>
+    <div class="creature hidden">
+      <h3>Appearance</h3>
+      <label for="f-body">Body, fur, scales or materials</label>
+      <input id="f-body" maxlength="160" placeholder="e.g. large tiger with orange fur, black stripes and amber eyes">
+    </div>
+
+    <h3>Signature look</h3>
+    <label for="f-outfit">Outfit</label><input id="f-outfit" maxlength="160" placeholder="e.g. a teal explorer jacket with brass buttons and a leather satchel">
+    <div class="grid2">
+      <div><label for="f-props">Signature items</label><input id="f-props" maxlength="120" placeholder="e.g. a glowing brass lantern"></div>
+      <div><label for="f-palette">Color palette</label><input id="f-palette" maxlength="80" placeholder="e.g. teal, gold and cream"></div>
+    </div>
+    <label for="f-personality">Personality</label><input id="f-personality" maxlength="100" placeholder="e.g. curious, fearless and kind">
+    <label for="f-notes">Anything else · optional</label><textarea id="f-notes" maxlength="600" placeholder="Details that must never change: a birthmark, a tattoo, glasses…"></textarea>
+
+    <div class="section">
+      <h3>Prompt description</h3>
+      <p class="note" style="margin:2px 0 0">This is what the studio puts into prompts. It updates from the fields above, or edit it yourself.</p>
+      <textarea id="f-description" style="min-height:110px;margin-top:8px" aria-label="Prompt description"></textarea>
+      <div class="row" style="margin-top:8px"><button type="button" class="chip hidden" id="rebuild">Rebuild from fields</button><span class="note" id="desc-mode"></span></div>
+    </div>
+
+    <div class="section">
+      <h3>Reference images</h3>
+      <p class="note" style="margin:2px 0 0">Add up to 6 images: a finished character sheet, a portrait, a full-body pose. Attach them in your image tool along with the prompt.</p>
+      <div class="refs" id="refs"></div>
+      <input type="file" id="ref-input" accept="image/*" multiple class="hidden">
+    </div>
+
+    <div class="section">
+      <h3>Make a character sheet</h3>
+      <p class="note" style="margin:2px 0 0">Copy this into ChatGPT, Gemini or Midjourney to create a turnaround sheet, then add the result above as a reference image.</p>
+      <div class="grid2">
+        <div><label for="sheet-style">Art style</label><select id="sheet-style">
+          <option>Cinematic 3D animation</option><option>Anime</option><option>Semi-realistic digital painting</option><option>Photorealistic</option><option>Comic book</option><option>Watercolor storybook</option><option>Afrofuturism</option><option>Manga (monochrome)</option>
+        </select></div>
+        <div><label for="sheet-layout">Sheet layout</label><select id="sheet-layout">
+          <option value="full">Turnaround, expressions and details</option><option value="turn">Turnaround only</option><option value="faces">Expressions only</option>
+        </select></div>
+      </div>
+      <pre id="sheet-out"></pre>
+      <div class="row"><button type="button" class="chip" id="copy-sheet">Copy sheet prompt</button></div>
+    </div>
+
+    <div class="row section" style="padding-top:16px">
+      <button type="button" class="chip" id="duplicate">Duplicate</button>
+      <button type="button" class="chip danger" id="delete">Delete</button>
+    </div>
+    <div class="savebar">
+      <button type="button" class="primary" id="save">Save character</button>
+      <button type="button" id="use">Use in studio →</button>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+</main>
+
+<script src="characters-store.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const S = CharacterStore;
+const HERITAGES = {
+  'Africa & diaspora': ['African American','Black British','West African','Nigerian','Ghanaian','Senegalese','East African','Ethiopian','Kenyan','Somali','North African','South African'],
+  'East Asia': ['Chinese','Japanese','Korean','Mongolian','Taiwanese'],
+  'South Asia': ['Indian','Pakistani','Bangladeshi','Sri Lankan','Nepali'],
+  'Southeast Asia': ['Filipino','Vietnamese','Thai','Indonesian','Malaysian','Cambodian'],
+  'Middle East': ['Arab','Persian','Turkish','Kurdish','Lebanese'],
+  'Europe': ['Irish','Scottish','Italian','Greek','Spanish','French','German','Nordic','Slavic'],
+  'Latin America': ['Mexican','Brazilian','Colombian','Peruvian','Argentine','Afro-Latino'],
+  'Caribbean': ['Jamaican','Haitian','Trinidadian','Puerto Rican','Cuban','Dominican'],
+  'Indigenous peoples': ['Native American','Inuit','Maya','Quechua','Sámi','Aboriginal Australian'],
+  'Pacific Islands': ['Samoan','Māori','Native Hawaiian','Tongan','Fijian'],
+  'Mixed': ['mixed-heritage']
+};
+const FIELDS = ['name','kind','role','age','heritage','heritage-other','pronouns','skin','eyes','hair','build','face','body','outfit','props','palette','personality','notes'];
+const prop = k => k === 'heritage-other' ? 'heritageOther' : k;
+
+let current = null;       // the character being edited
+let images = [];          // its reference images (data URLs)
+let dirty = false;
+
+// ---------- form ----------
+(() => {
+  const sel = $('f-heritage'), opt = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t || v; return o; };
+  sel.append(opt('', 'Not specified'));
+  Object.entries(HERITAGES).forEach(([g, list]) => { const og = document.createElement('optgroup'); og.label = g; list.forEach(h => og.append(opt(h, h === 'mixed-heritage' ? 'Mixed heritage' : h))); sel.append(og); });
+  sel.append(opt('Other', 'Other…'));
+})();
+
+function readForm() {
+  const c = {...(current || {})};
+  FIELDS.forEach(k => c[prop(k)] = $('f-' + k).value.trim());
+  // creatures keep their body description in "face" slot-free form
+  if (c.kind === 'creature') { c.heritage = ''; c.skin = ''; c.eyes = ''; c.hair = ''; c.build = ''; c.face = c.body; c.age = c.age || ''; }
+  c.descEdited = $('f-description').dataset.edited === '1';
+  c.description = $('f-description').value.trim();
+  return c;
+}
+function fillForm(c) {
+  FIELDS.forEach(k => { $('f-' + k).value = c[prop(k)] || (k === 'kind' ? 'person' : ''); });
+  if (c.kind === 'creature') $('f-body').value = c.body || c.face || '';
+  $('f-description').dataset.edited = c.descEdited ? '1' : '';
+  $('f-description').value = c.descEdited ? c.description : S.describe({...c, descEdited: false});
+  $('ed-h').textContent = c.name ? c.name : 'New character';
+  $('saved-at').textContent = c.updated ? 'Saved ' + new Date(c.updated).toLocaleString([], {dateStyle: 'medium', timeStyle: 'short'}) : 'Not saved yet';
+  syncKind(); syncDescMode(); renderSheet();
+}
+function syncKind() {
+  const creature = $('f-kind').value === 'creature';
+  document.querySelectorAll('.person').forEach(e => e.classList.toggle('hidden', creature));
+  document.querySelectorAll('.creature').forEach(e => e.classList.toggle('hidden', !creature));
+  $('heritage-other-wrap').classList.toggle('hidden', creature || $('f-heritage').value !== 'Other');
+}
+function syncDescMode() {
+  const edited = $('f-description').dataset.edited === '1';
+  $('rebuild').classList.toggle('hidden', !edited);
+  $('desc-mode').textContent = edited ? 'Edited by you; field changes no longer update it.' : 'Updating automatically.';
+}
+function onFieldChange() {
+  dirty = true;
+  if ($('f-description').dataset.edited !== '1') $('f-description').value = S.describe({...readForm(), descEdited: false});
+  $('ed-h').textContent = $('f-name').value.trim() || 'New character';
+  syncKind(); renderSheet();
+}
+FIELDS.forEach(k => $('f-' + k).addEventListener(k === 'kind' || k === 'heritage' ? 'change' : 'input', onFieldChange));
+$('f-description').addEventListener('input', () => { $('f-description').dataset.edited = '1'; dirty = true; syncDescMode(); renderSheet(); });
+$('rebuild').onclick = () => { $('f-description').dataset.edited = ''; $('f-description').value = S.describe({...readForm(), descEdited: false}); dirty = true; syncDescMode(); renderSheet(); };
+
+// ---------- character sheet prompt ----------
+function renderSheet() {
+  const c = readForm(), desc = $('f-description').value.trim() || 'an original character';
+  const who = c.name ? `an original character named ${c.name}` : 'an original character';
+  const style = $('sheet-style').value, layout = $('sheet-layout').value, creature = c.kind === 'creature';
+  const L = [`Create a professional character reference sheet for ${who}.`, '', `Character: ${desc.replace(/\.$/, '')}.`, '', 'Layout: one wide 16:9 image on a plain light-gray background.'];
+  if (layout !== 'faces') L.push(`- Full-body turnaround in one row: front, three-quarter, side profile and back views, in the same neutral ${creature ? 'stance' : 'standing pose'}, same scale, feet on one baseline.`);
+  if (layout !== 'turn') L.push(`- A row of ${layout === 'faces' ? 'six' : 'four'} head-and-shoulders expressions: neutral, joyful, determined, surprised${layout === 'faces' ? ', thoughtful, laughing' : ''}.`);
+  if (layout === 'full') L.push('- Close-up details of the outfit, hair and signature items, plus small color swatches for the main colors.');
+  L.push('', `Keep ${c.name || 'the character'} identical in every view: same face, proportions, ${creature ? 'markings' : 'skin tone, hair texture'}, outfit and colors. Even, neutral studio lighting with soft shadows.`);
+  if (!creature && (c.heritage || c.skin)) L.push('Keep skin tone and hair texture exactly as described in this art style; do not lighten skin or change hair texture.');
+  L.push(`Style: ${style}${style.startsWith('Manga') ? ' — monochrome ink and screen tones; show darker skin with darker tones, never blank white' : ''}.`);
+  L.push('No text, labels, names, logos or watermarks. A fully original design, not resembling any existing character.');
+  $('sheet-out').textContent = L.join('\n');
+}
+$('sheet-style').onchange = renderSheet; $('sheet-layout').onchange = renderSheet;
+$('copy-sheet').onclick = () => copyText($('sheet-out').textContent, 'Sheet prompt copied. Paste it into your image tool.');
+
+async function copyText(text, msg) {
+  try { await navigator.clipboard.writeText(text); status(msg); }
+  catch (e) { status('Copying was blocked. Select the text and copy it manually.'); }
+}
+function status(t) { $('status').textContent = t; }
+
+// ---------- reference images ----------
+function renderRefs() {
+  const nodes = images.map((src, i) => {
+    const d = document.createElement('div'); d.className = 'ref';
+    const img = document.createElement('img'); img.src = src; img.alt = `Reference ${i + 1}`;
+    const x = document.createElement('button'); x.type = 'button'; x.textContent = 'Remove'; x.setAttribute('aria-label', `Remove reference ${i + 1}`);
+    x.onclick = () => { images.splice(i, 1); dirty = true; renderRefs(); };
+    d.append(img, x); return d;
+  });
+  if (images.length < 6) {
+    const add = document.createElement('button'); add.type = 'button'; add.className = 'ref-add'; add.textContent = '+ Add image';
+    add.onclick = () => $('ref-input').click(); nodes.push(add);
+  }
+  $('refs').replaceChildren(...nodes);
+}
+$('ref-input').onchange = async e => {
+  const files = [...e.target.files].slice(0, 6 - images.length);
+  for (const f of files) { try { images.push(await S.shrink(f)); } catch (err) { status(err.message); } }
+  e.target.value = ''; dirty = true; renderRefs();
+  if (files.length) status('Image added. Save to keep it.');
+};
+
+// ---------- library ----------
+function renderList() {
+  const q = $('search').value.trim().toLowerCase();
+  const all = S.list(), shown = all.filter(c => !q || [c.name, c.role, c.heritage, c.description].join(' ').toLowerCase().includes(q));
+  if (!all.length) {
+    const e = document.createElement('div'); e.className = 'empty note';
+    e.textContent = 'No characters yet. Fill in the sheet and save, or add Ether and Element to start.';
+    $('list').replaceChildren(e); return;
+  }
+  $('list').replaceChildren(...shown.map(c => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'item';
+    b.setAttribute('aria-current', String(current && current.id === c.id));
+    const av = document.createElement('span'); av.className = 'avatar'; av.textContent = (c.name || '?').charAt(0).toUpperCase(); av.setAttribute('aria-hidden', 'true');
+    if (c.thumb) { av.style.backgroundImage = `url("${c.thumb}")`; av.textContent = ''; }
+    const t = document.createElement('span'), n = document.createElement('b'), s = document.createElement('small');
+    n.textContent = c.name || 'Untitled';
+    s.textContent = [c.role, c.heritage && c.heritage !== 'Other' ? c.heritage : c.heritageOther, c.refs ? `${c.refs} ref${c.refs === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ') || 'Character';
+    t.append(n, s); b.append(av, t);
+    b.onclick = () => open(c.id);
+    return b;
+  }));
+  if (!shown.length) { const e = document.createElement('div'); e.className = 'empty note'; e.textContent = 'No characters match.'; $('list').append(e); }
+}
+$('search').oninput = renderList;
+
+function guard() { return !dirty || confirmLeave(); }
+let leaveArmed = 0;
+function confirmLeave() {
+  if (Date.now() - leaveArmed < 4000) return true;
+  leaveArmed = Date.now(); status('You have unsaved changes. Tap again to discard them, or Save first.');
+  return false;
+}
+async function open(id) {
+  if (!guard()) return;
+  const c = S.get(id); if (!c) return;
+  current = c; images = await S.getImages(id); dirty = false;
+  fillForm(c); renderRefs(); renderList(); status('');
+  history.replaceState(null, '', '?id=' + encodeURIComponent(id));
+  if (innerWidth < 900) $('ed-h').scrollIntoView({behavior: 'smooth'});
+}
+function blank(seed = {}) {
+  current = {id: S.newId(), kind: 'person', ...seed}; images = []; dirty = false;
+  fillForm(current); renderRefs(); renderList(); status('');
+  history.replaceState(null, '', location.pathname);
+}
+$('new').onclick = () => { if (guard()) { blank(); $('f-name').focus(); } };
+
+async function save() {
+  const c = readForm();
+  if (!c.name) { status('Give your character a name first.'); $('f-name').focus(); return null; }
+  c.description = $('f-description').value.trim() || S.describe({...c, descEdited: false});
+  c.refs = images.length;
+  c.thumb = '';
+  if (images[0]) { try { c.thumb = await thumbOf(images[0]); } catch (e) {} }
+  try {
+    S.upsert(c);
+    await S.setImages(c.id, images).catch(() => { throw new Error('images'); });
+  } catch (e) {
+    status(e.message === 'images' ? 'Saved the details, but this browser blocked saving images.' : 'Couldn\'t save: this browser\'s storage is full or blocked. Export a backup and remove old characters.');
+    return null;
+  }
+  current = S.get(c.id); dirty = false;
+  fillForm(current); renderList();
+  history.replaceState(null, '', '?id=' + encodeURIComponent(c.id));
+  status(`Saved ${c.name}.`);
+  return current;
+}
+function thumbOf(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); img.onload = () => {
+      const s = Math.min(img.width, img.height), c = document.createElement('canvas'); c.width = c.height = 96;
+      c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, 96, 96);
+      resolve(c.toDataURL('image/jpeg', .8));
+    }; img.onerror = reject; img.src = src;
+  });
+}
+$('save').onclick = save;
+$('use').onclick = async () => {
+  const c = dirty || !S.get(current.id) ? await save() : current;
+  if (c) location.href = 'index.html?char=' + encodeURIComponent(c.id);
+};
+$('duplicate').onclick = async () => {
+  const c = readForm(); const imgs = images.slice();
+  blank({...c, id: S.newId(), name: (c.name || 'Character') + ' copy', updated: 0});
+  images = imgs; renderRefs(); dirty = true; status('Copy made. Save to keep it.');
+};
+let delArmed = 0;
+$('delete').onclick = async () => {
+  if (!S.get(current.id)) { blank(); return; }
+  if (Date.now() - delArmed > 4000) { delArmed = Date.now(); $('delete').textContent = 'Tap again to delete'; setTimeout(() => $('delete').textContent = 'Delete', 4000); return; }
+  const name = current.name; await S.remove(current.id); dirty = false; $('delete').textContent = 'Delete';
+  blank(); status(`Deleted ${name}.`);
+};
+
+// ---------- backup ----------
+$('export').onclick = async () => {
+  const all = S.list();
+  if (!all.length) { status('Nothing to export yet.'); return; }
+  const data = {app: 'Ether Image Studio', type: 'characters', version: 1, exported: new Date().toISOString(), characters: []};
+  for (const c of all) data.characters.push({...c, images: await S.getImages(c.id)});
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
+  const a = document.createElement('a'); a.href = url; a.download = `ether-characters-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  status(`Exported ${all.length} character${all.length === 1 ? '' : 's'}.`);
+};
+$('import-btn').onclick = () => $('import').click();
+$('import').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    const list = Array.isArray(data) ? data : data.characters;
+    if (!Array.isArray(list)) throw new Error();
+    let n = 0;
+    for (const raw of list) {
+      if (!raw || typeof raw !== 'object' || typeof raw.name !== 'string') continue;
+      const imgs = Array.isArray(raw.images) ? raw.images.filter(s => typeof s === 'string' && s.startsWith('data:image/')).slice(0, 6) : [];
+      const c = {};
+      [...FIELDS.map(prop), 'description', 'descEdited', 'thumb', 'id'].forEach(k => { if (raw[k] !== undefined) c[k] = typeof raw[k] === 'boolean' ? raw[k] : String(raw[k]).slice(0, 2000); });
+      if (c.thumb && !c.thumb.startsWith('data:image/')) c.thumb = '';
+      c.id = /^[\w-]{1,40}$/.test(c.id || '') ? c.id : S.newId();
+      c.refs = imgs.length;
+      S.upsert(c); await S.setImages(c.id, imgs).catch(() => {}); n++;
+    }
+    renderList(); status(`Imported ${n} character${n === 1 ? '' : 's'}.`);
+  } catch (err) { status('That file isn\'t an Ether character backup.'); }
+};
+
+// Starter sheets from the studio's Ether and Element descriptions
+$('seed').onclick = () => {
+  let v = {};
+  try { v = JSON.parse(localStorage.getItem('ether-studio-v2'))?.values || {}; } catch (e) {}
+  const have = S.list().map(c => c.name);
+  const add = [];
+  if (!have.includes('Ether')) add.push({name: 'Ether', kind: 'person', role: 'young explorer', personality: 'curious and fearless', notes: 'Match Ether\'s character sheet exactly', description: v['ether-look'] || 'Ether, a young explorer with a curious, fearless spirit', descEdited: true});
+  if (!have.includes('Element')) add.push({name: 'Element', kind: 'creature', role: 'tiger companion', body: 'a large, gentle, loyal tiger whose form changes with the world around them', description: v['element-look'] || 'Element, Ether\'s tiger companion: a large, gentle, loyal tiger whose form changes with the world around them', descEdited: true});
+  if (!add.length) { status('Ether and Element are already in your cast.'); return; }
+  try { add.forEach(c => S.upsert({id: S.newId(), refs: 0, ...c})); } catch (e) { status('Couldn\'t save: storage is full or blocked.'); return; }
+  renderList(); status(`Added ${add.map(c => c.name).join(' and ')}. Open them to fill in the details and add their character sheets.`);
+};
+
+// ---------- start ----------
+const params = new URLSearchParams(location.search);
+renderList();
+if (params.get('id') && S.get(params.get('id'))) open(params.get('id'));
+else blank();
+})();
+</script>
+</body>
+</html>

@@ -182,7 +182,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
       <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="eg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b3fe4"/><stop offset=".5" stop-color="#0071e3"/><stop offset="1" stop-color="#e0508f"/></linearGradient></defs><path d="M32 4c2.6 16.4 11.6 25.4 28 28-16.4 2.6-25.4 11.6-28 28C29.4 43.6 20.4 34.6 4 32c16.4-2.6 25.4-11.6 28-28z" fill="url(#eg)"/></svg>
       <span>Ether Image Studio</span>
     </a>
-    <nav class="topnav" aria-label="Studio navigation"><a href="index.html" aria-current="page">Studio</a><a href="locations.html">Locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
+    <nav class="topnav" aria-label="Studio navigation"><a href="index.html" aria-current="page">Studio</a><a href="characters.html">Characters</a><a href="locations.html">Locations</a><a href="anime.html">Japanese Anime</a><a href="donghua.html">Donghua &amp; Fusion</a><a href="world.html">World Styles</a></nav>
   </div>
 </header>
 
@@ -263,6 +263,14 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
       <label for="es-character-look">Character appearance</label>
       <textarea id="es-character-look" style="min-height:70px" placeholder="Describe their age, skin tone, hair, clothing, markings, and personality…"></textarea>
       <label class="check"><input type="checkbox" id="es-character-ref"> I'm attaching this character's reference sheet</label>
+      <div class="row" style="margin-top:6px">
+        <a id="es-edit-sheet" class="hidden" href="characters.html">Edit this character's sheet →</a>
+        <button type="button" id="es-save-char" class="chip">💾 Save to My characters</button>
+      </div>
+      <div id="es-save-char-form" class="row hidden" style="margin-top:8px">
+        <input id="es-save-char-name" maxlength="80" placeholder="Name this character" aria-label="Character name" style="flex:1;min-width:160px">
+        <button type="button" id="es-save-char-go" class="chip primary">Save</button>
+      </div>
       <p class="note">Edit any preset to match your character. Attach reference images in your image tool.</p>
     </div>
   </div>
@@ -368,6 +376,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
   <button type="button" data-copy="motion">Motion</button>
 </div>
 
+<script src="characters-store.js"></script>
 <script src="locations-data.js"></script>
 <script src="anime-data.js"></script>
 <script src="donghua-data.js"></script>
@@ -649,6 +658,18 @@ function buildCharacterMenu(keep) {
   const opt = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; return o; };
   const nodes = [opt('', 'Use my scene description')];
   let count = 0;
+  // Saved character sheets from the Characters page
+  Object.keys(CHARACTER_PRESETS).filter(k => k.startsWith('my:')).forEach(k => delete CHARACTER_PRESETS[k]);
+  const mine = (typeof CharacterStore === 'object' ? CharacterStore.list() : []).map(c => {
+    const key = 'my:' + c.id;
+    CHARACTER_PRESETS[key] = {name: c.name || 'Untitled', look: CharacterStore.describe(c), mine: true, id: c.id, refs: c.refs || 0, kind: c.kind || 'person'};
+    return key;
+  }).filter(k => !q || CHARACTER_PRESETS[k].name.toLowerCase().includes(q) || 'my characters'.startsWith(q) || k === keep);
+  if (mine.length) {
+    const og = document.createElement('optgroup'); og.label = 'My characters';
+    mine.forEach(k => { og.append(opt(k, CHARACTER_PRESETS[k].name + (CHARACTER_PRESETS[k].refs ? ' 📎' : ''))); if (k !== keep) count++; });
+    nodes.push(og);
+  }
   Object.entries(CHARACTER_GROUPS).forEach(([g, keys]) => {
     const match = keys.filter(k => !q || CHARACTER_PRESETS[k].name.toLowerCase().includes(q) || g.toLowerCase().startsWith(q) || k === keep);
     if (!match.length) return;
@@ -924,7 +945,7 @@ function location() {
 }
 function hasPerson() {
   const p = CHARACTER_PRESETS[$('character').value];
-  return !!(p && clean($('character-look').value) && (p.person || $('character').value === 'custom'));
+  return !!(p && clean($('character-look').value) && (p.person || $('character').value === 'custom' || (p.mine && p.kind !== 'creature')));
 }
 function characters() {
   const list = [];
@@ -1165,9 +1186,42 @@ $('character').addEventListener('change', () => {
   const preset = CHARACTER_PRESETS[$('character').value];
   $('character-look').value = presetLook($('character').value);
   $('character-look').dataset.auto = preset && preset.person ? 'preset' : '';
-  $('character-ref').checked = false;
+  $('character-ref').checked = !!(preset && preset.mine && preset.refs); // saved sheets with images: remind to attach them
+  if (preset && preset.mine) $('status').textContent = preset.refs ? `${preset.name} loaded. Attach their ${preset.refs} reference image${preset.refs === 1 ? '' : 's'} in your image tool.` : `${preset.name} loaded.`;
   renderCharacters(); renderOutputs(); save();
 });
+function syncSavedCharacterUI() {
+  const p = CHARACTER_PRESETS[$('character').value];
+  $('edit-sheet').classList.toggle('hidden', !(p && p.mine));
+  if (p && p.mine) $('edit-sheet').href = 'characters.html?id=' + encodeURIComponent(p.id);
+  $('save-char').textContent = p && p.mine ? '💾 Update saved character' : '💾 Save to My characters';
+}
+$('character').addEventListener('change', syncSavedCharacterUI);
+$('save-char').onclick = () => {
+  const p = CHARACTER_PRESETS[$('character').value], look = clean($('character-look').value);
+  if (!look) { $('status').textContent = 'Describe the character first.'; return; }
+  if (p && p.mine) { // update the existing sheet's prompt description
+    const c = CharacterStore.get(p.id);
+    if (c) { try { CharacterStore.upsert({...c, description: look, descEdited: true}); $('status').textContent = `Updated ${c.name}.`; } catch (e) { $('status').textContent = 'Couldn\'t save: storage is full or blocked.'; } }
+    buildCharacterMenu($('character').value); return;
+  }
+  $('save-char-form').classList.remove('hidden'); $('save-char-name').focus();
+};
+function saveCharacterFromStudio() {
+  const name = $('save-char-name').value.trim(), look = clean($('character-look').value), p = CHARACTER_PRESETS[$('character').value];
+  if (!name) { $('save-char-name').focus(); return; }
+  const c = {id: CharacterStore.newId(), name, kind: p && !p.person && $('character').value !== 'custom' ? 'creature' : 'person',
+    role: p && $('character').value !== 'custom' ? p.name : '', heritage: $('heritage').value && $('heritage').value !== 'match' ? $('heritage').value : '',
+    description: name + ': ' + look, descEdited: true, refs: 0};
+  try { CharacterStore.upsert(c); } catch (e) { $('status').textContent = 'Couldn\'t save: storage is full or blocked.'; return; }
+  $('save-char-form').classList.add('hidden'); $('save-char-name').value = '';
+  buildCharacterMenu('my:' + c.id); $('character').dispatchEvent(new Event('change'));
+  $('status').textContent = `Saved ${name}. Open Characters to add details and reference images.`;
+}
+$('save-char-go').onclick = saveCharacterFromStudio;
+$('save-char-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveCharacterFromStudio(); } });
+// Pick up characters saved or edited in another tab
+addEventListener('storage', e => { if (e.key === CharacterStore.KEY) buildCharacterMenu($('character').value); });
 $('images').onclick = () => { group = 'Image styles'; $('search').value = ''; render(); save(); };
 $('three').onclick = () => { group = '3D looks'; $('search').value = ''; render(); save(); };
 $('world').onclick = () => {group='World styles';$('search').value='';render();save();};
@@ -1239,6 +1293,14 @@ buildLocations('');
 restore();
 fillStarterLooks(false);
 const locationParams = new URLSearchParams(window.location.search);
+if (locationParams.has('char')) {
+  const key = 'my:' + locationParams.get('char');
+  $('char-search').value = ''; buildCharacterMenu(key);
+  if (CHARACTER_PRESETS[key]) { $('character').value = key; $('character').dispatchEvent(new Event('change')); }
+  locationParams.delete('char');
+  history.replaceState(null, '', window.location.pathname + (locationParams.size ? '?' + locationParams : '') + window.location.hash);
+}
+syncSavedCharacterUI();
 const incomingWorld = WORLD_STYLES.find(s => s.id === locationParams.get('world'));
 if(incomingWorld){selected=[incomingWorld.id];weights=[100];group='World styles';$('mode').value='1';save();}
 if(locationParams.has('world')){locationParams.delete('world');history.replaceState(null,'',window.location.pathname+(locationParams.size?'?'+locationParams:'')+window.location.hash);}

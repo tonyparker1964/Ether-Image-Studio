@@ -7,6 +7,7 @@ Explore 146 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 don
 ## Pages
 
 - **Image Studio** (`index.html`) builds the prompts.
+- **Characters** (`characters.html`) is your saved cast. Build a character sheet (name, heritage, skin, hair, eyes, outfit, signature items, palette, personality), add up to 6 reference images, copy a turnaround reference-sheet prompt, and send the character to the studio. Saved in your browser; **Export all** makes a backup file and **Import** restores it on any device.
 - **Explore locations** (`locations.html`) browses all 570 locations with previews, search and categories, then sends your pick to the studio.
 - **Japanese Anime** (`anime.html`) browses the 33 anime looks by era, genre and visual approach, then sends your pick to the studio.
 
@@ -19,6 +20,7 @@ Explore 146 looks: 51 image styles, 21 3D looks, 33 Japanese anime looks, 10 don
    - **Heritage:** Random, *Match the style's region* (a Korean manhwa look gives a Korean character, Nordic saga a Nordic one, and so on), or a specific heritage from 11 regions. **More appearance options** adds skin tone and hair texture. These shape the people presets and the random character; typing your own description is never overwritten. Leave skin tone and hair texture on Any to get a natural range for the chosen heritage, and the prompt tells the image tool not to lighten skin or change hair texture to fit the art style.
    - **Scene character:** 140+ presets in 11 groups (people, adventure and action, fantasy people, sci-fi and future, everyday and modern, music dance and sports, myth and spirit, animals, fantasy creatures, robots and tech, companions), with a search box, or your own. People presets take on the heritage you pick; animals, creatures and robots are fixed original designs. Edit any description to match your character.
    - **Ether and Element:** pick Element's form (tiger, earth, water, fire, air or a blend). Edit both under "Edit character looks".
+   - **My characters** at the top of the Scene character menu lists your saved sheets (📎 means it has reference images). **💾 Save to My characters** saves whatever character is in the studio.
    - Tick the reference box for any character whose sheet you're attaching.
 4. Pick your image tool:
    - **ChatGPT / Gemini** gives a structured natural-language prompt.
@@ -35,7 +37,8 @@ This public website builds prompts; it does not call an image API or contain API
 
 ## Files
 
-- `index.html`, `locations.html`, `anime.html` are the three pages.
+- `index.html`, `characters.html`, `locations.html`, `anime.html`, `donghua.html`, `world.html` are the pages.
+- `characters-store.js` saves character sheets (details in localStorage, reference images in IndexedDB) and is shared by the studio and the Characters page.
 - `locations-data.js` holds the 570 locations; `anime-data.js` holds the 33 anime looks; `donghua-data.js` holds the donghua looks; `world-data.js` holds the 15 world styles; `visions-data.js` holds the 16 Ether Visions (gradient thumbnails for now).
 - `thumbnails.js` maps each location, anime look and character preset to its tile in an atlas, and lazy-loads previews as they scroll into view.
 - `assets/styles.webp` holds the first 42 style thumbnails (6 × 7 grid); `assets/styles-new-1.webp` and `-2.webp` hold styles 42–71 (3 × 5 grids).
