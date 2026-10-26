@@ -248,7 +248,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
           <option value="">Any</option><option value="fair skin">Fair</option><option value="light skin">Light</option><option value="light olive skin">Olive</option><option value="medium tan skin">Medium</option><option value="warm brown skin">Brown</option><option value="deep brown skin">Deep brown</option><option value="very deep, dark skin">Very deep</option>
         </select></div>
         <div><label for="es-texture">Hair texture</label><select id="es-texture">
-          <option value="">Any</option><option value="straight">Straight</option><option value="wavy">Wavy</option><option value="curly">Curly</option><option value="coily">Coily</option>
+          <option value="">Any</option><option value="straight">Straight</option><option value="wavy">Wavy</option><option value="curly">Curly</option><option value="coily">Coily</option><option value="locs">Dreadlocks (locs)</option>
         </select></div>
       </div>
     </details>
@@ -462,12 +462,12 @@ const MONO = new Set(['i8', 'i10', 'i23', 'd12']);
 
 // People presets are templates: heritage, skin tone and hair texture are filled in from the menus.
 const CHARACTER_PRESETS = {
-  boy: {name: 'Boy explorer', person: {who: 'young boy explorer', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short coily hair'}, rest: 'a teal jacket, and a curious, fearless spirit'}},
-  girl: {name: 'Girl explorer', person: {who: 'young girl explorer', hair: {any: 'hair in two pigtails', straight: 'straight hair in two high pigtails', wavy: 'wavy hair in two pigtails', curly: 'curly hair in two puffs', coily: 'natural coily hair in two puffs'}, rest: 'a golden-yellow jacket, and a curious, adventurous spirit'}},
-  man: {name: 'Adult man', person: {who: 'adult man', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair'}, rest: 'an indigo jacket, and a calm, confident presence'}},
-  woman: {name: 'Adult woman', person: {who: 'adult woman', hair: {any: 'shoulder-length hair', straight: 'long straight hair', wavy: 'loose waves', curly: 'natural curls', coily: 'natural coily hair'}, rest: 'an emerald outfit, and a confident, creative presence'}},
-  'elder-man': {name: 'Elder man', person: {who: 'elder man', hair: {any: 'silver hair and beard', straight: 'straight silver hair and beard', wavy: 'wavy silver hair and beard', curly: 'curly silver hair and beard', coily: 'coily silver hair and beard'}, rest: 'an earth-toned robe, and a thoughtful, warm expression'}},
-  'elder-woman': {name: 'Elder woman', person: {who: 'elder woman', hair: {any: 'silver hair', straight: 'straight silver hair in a low bun', wavy: 'wavy silver hair', curly: 'silver curls', coily: 'silver natural coily hair'}, rest: 'a patterned indigo shawl, and a wise, warm expression'}},
+  boy: {name: 'Boy explorer', person: {who: 'young boy explorer', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short coily hair', locs: 'short dreadlocks'}, rest: 'a teal jacket, and a curious, fearless spirit'}},
+  girl: {name: 'Girl explorer', person: {who: 'young girl explorer', hair: {any: 'hair in two pigtails', straight: 'straight hair in two high pigtails', wavy: 'wavy hair in two pigtails', curly: 'curly hair in two puffs', coily: 'natural coily hair in two puffs', locs: 'dreadlocks tied up in two high buns'}, rest: 'a golden-yellow jacket, and a curious, adventurous spirit'}},
+  man: {name: 'Adult man', person: {who: 'adult man', hair: {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair', locs: 'shoulder-length dreadlocks'}, rest: 'an indigo jacket, and a calm, confident presence'}},
+  woman: {name: 'Adult woman', person: {who: 'adult woman', hair: {any: 'shoulder-length hair', straight: 'long straight hair', wavy: 'loose waves', curly: 'natural curls', coily: 'natural coily hair', locs: 'long dreadlocks'}, rest: 'an emerald outfit, and a confident, creative presence'}},
+  'elder-man': {name: 'Elder man', person: {who: 'elder man', hair: {any: 'silver hair and beard', straight: 'straight silver hair and beard', wavy: 'wavy silver hair and beard', curly: 'curly silver hair and beard', coily: 'coily silver hair and beard', locs: 'long silver dreadlocks and a beard'}, rest: 'an earth-toned robe, and a thoughtful, warm expression'}},
+  'elder-woman': {name: 'Elder woman', person: {who: 'elder woman', hair: {any: 'silver hair', straight: 'straight silver hair in a low bun', wavy: 'wavy silver hair', curly: 'silver curls', coily: 'silver natural coily hair', locs: 'long silver dreadlocks'}, rest: 'a patterned indigo shawl, and a wise, warm expression'}},
   tiger: {name: 'Tiger', look: 'An expressive tiger with orange fur, recognizable black stripes, bright amber eyes, and a curious, courageous presence'},
   fox: {name: 'Fox explorer', look: 'An expressive red fox explorer with russet fur, a white muzzle, dark paws, a teal scarf, and a small satchel'},
   robot: {name: 'Robot companion', look: 'A friendly original robot with rounded brass and teal panels, expressive luminous eyes, articulated limbs, and a curious personality'},
@@ -477,9 +477,9 @@ const CHARACTER_PRESETS = {
 
 // Expanded character library. People are templates (heritage, skin and hair fill in);
 // animals, creatures and machines are fixed, fully original descriptions.
-const HAIR_SHORT = {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair'};
-const HAIR_LONG = {any: 'long hair', straight: 'long straight hair', wavy: 'long wavy hair', curly: 'long natural curls', coily: 'natural coily hair'};
-const HAIR_TIED = {any: 'hair tied back', straight: 'straight hair tied back', wavy: 'wavy hair tied back', curly: 'curly hair pulled into a puff', coily: 'coily hair in braids'};
+const HAIR_SHORT = {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair', locs: 'short dreadlocks'};
+const HAIR_LONG = {any: 'long hair', straight: 'long straight hair', wavy: 'long wavy hair', curly: 'long natural curls', coily: 'natural coily hair', locs: 'long dreadlocks'};
+const HAIR_TIED = {any: 'hair tied back', straight: 'straight hair tied back', wavy: 'wavy hair tied back', curly: 'curly hair pulled into a puff', coily: 'coily hair in braids', locs: 'dreadlocks tied up'};
 const PEOPLE = {
   'Adventure and action': [
     ['astronaut','Astronaut','adult astronaut',HAIR_SHORT,'a white-and-orange space suit with mission patches, helmet under one arm'],
@@ -746,7 +746,7 @@ function presetLook(key) {
   if (!p.person) return p.look;
   const h = resolveHeritage(), t = traitsFor(h);
   const skin = $('skin').value || (t ? pick(t.skin) : '');
-  const hair = p.person.hair[$('texture').value || (t ? pick(t.tex) : 'any')];
+  const tx = $('texture').value || (t ? pick(t.tex) : 'any'), hair = p.person.hair[tx] || p.person.hair.any;
   const [first, ...rest] = p.person.who.split(' '); // e.g. "young" + "girl explorer"
   const an = /^[aeiou]/i.test(first) ? 'An' : 'A';
   return `${an} ${first} ${heritageWords(h)} ${rest.join(' ')} with ${skin ? skin + ', ' : ''}${hair}, ${p.person.rest}. ${RESPECT}`;
@@ -784,7 +784,9 @@ function randomCharacter() {
   // Hair, eyes and outfit follow the heritage's typical range; fantasy colors appear only occasionally
   const color = fantasy ? pick(POOL.fantasyHair) : pick(t ? t.hairColor : POOL.hairColor);
   const style = pick(t ? t.styles : POOL.hairStyle);
-  const hair = `${color} ${tex ? tex + ' ' : ''}hair ${style}`;
+  const hair = tex === 'locs'
+    ? `${color} dreadlocks ${pick(['worn loose to the shoulders', 'tied up in a high bun', 'falling to the waist', 'with gold cuffs', 'pulled back with a wrap', 'cropped short'])}`
+    : `${color} ${tex ? tex + ' ' : ''}hair ${style}`;
   const eyes = fantasy && Math.random() < 0.5 ? pick(POOL.fantasyEyes) : pick(t ? t.eyes : POOL.eyes);
   const outfit = t && Math.random() < 0.4 ? pick(t.outfits) : pick(POOL.outfitAny);
   return `${an} ${lead} ${who}, ${pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${pick(POOL.face)}, ${hair} and ${eyes}, dressed in ${outfit}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
