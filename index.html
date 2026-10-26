@@ -237,18 +237,8 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
   <div class="panel">
     <label for="es-character">Scene character</label>
     <select id="es-character">
-      <option value="">Use my scene description</option>
-      <optgroup label="People">
-        <option value="boy">Boy explorer</option><option value="girl">Girl explorer</option>
-        <option value="man">Adult man</option><option value="woman">Adult woman</option>
-        <option value="elder-man">Elder man</option><option value="elder-woman">Elder woman</option>
-      </optgroup>
-      <optgroup label="Imaginative companions">
-        <option value="tiger">Tiger</option><option value="fox">Fox</option>
-        <option value="robot">Robot</option><option value="fantasy">Fantasy guardian</option>
-      </optgroup>
-      <option value="custom">Custom character</option>
     </select>
+    <input id="es-char-search" type="search" placeholder="Find a character: knight, astronaut, dragon, DJ…" aria-label="Find a character" autocomplete="off" style="margin-top:8px">
     <label for="es-heritage">Heritage</label>
     <select id="es-heritage"></select>
     <details style="margin-top:8px">
@@ -262,7 +252,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
         </select></div>
       </div>
     </details>
-    <p class="note" style="margin:6px 0 0">Heritage, skin tone and hair texture shape the people presets and the random character. Ether and Element are never changed.</p>
+    <p class="note" style="margin:6px 0 0">Heritage, skin tone and hair texture shape the people presets and the random character. Ether and Element are never changed. Leave skin tone and hair texture on Any to use a natural range for the heritage.</p>
     <div id="es-character-previews" class="character-previews" role="group" aria-label="Character previews"></div>
     <div class="row" style="margin-top:10px">
       <button type="button" id="es-new-character" class="chip primary">🎲 New random character</button>
@@ -485,6 +475,193 @@ const CHARACTER_PRESETS = {
   custom: {name: 'Custom character', look: ''}
 };
 
+// Expanded character library. People are templates (heritage, skin and hair fill in);
+// animals, creatures and machines are fixed, fully original descriptions.
+const HAIR_SHORT = {any: 'short hair', straight: 'short straight hair', wavy: 'short wavy hair', curly: 'short curly hair', coily: 'short natural coily hair'};
+const HAIR_LONG = {any: 'long hair', straight: 'long straight hair', wavy: 'long wavy hair', curly: 'long natural curls', coily: 'natural coily hair'};
+const HAIR_TIED = {any: 'hair tied back', straight: 'straight hair tied back', wavy: 'wavy hair tied back', curly: 'curly hair pulled into a puff', coily: 'coily hair in braids'};
+const PEOPLE = {
+  'Adventure and action': [
+    ['astronaut','Astronaut','adult astronaut',HAIR_SHORT,'a white-and-orange space suit with mission patches, helmet under one arm'],
+    ['pilot','Pilot','adult pilot',HAIR_SHORT,'a vintage leather flight jacket and goggles'],
+    ['ship-captain','Ship captain','adult sea captain',HAIR_SHORT,'a navy captain\'s coat with brass buttons and a spyglass'],
+    ['pirate','Pirate','adult pirate',HAIR_LONG,'a weathered coat, sash and a bandana'],
+    ['treasure-hunter','Treasure hunter','young treasure hunter',HAIR_TIED,'a sun-worn hat, rope and an old map'],
+    ['archaeologist','Archaeologist','adult archaeologist',HAIR_TIED,'a khaki field vest with brushes and a notebook'],
+    ['mountain-climber','Mountain climber','adult mountain climber',HAIR_SHORT,'a bright insulated jacket, ropes and an ice axe'],
+    ['deep-sea-diver','Deep-sea diver','adult deep-sea diver',HAIR_SHORT,'a sleek wetsuit with a glowing dive light'],
+    ['detective','Detective','adult detective',HAIR_SHORT,'a long trench coat and a magnifying glass'],
+    ['secret-agent','Secret agent','adult secret agent',HAIR_SHORT,'a sharp black suit and a hidden earpiece'],
+    ['firefighter','Firefighter','adult firefighter',HAIR_SHORT,'turnout gear with reflective stripes and a helmet'],
+    ['park-ranger','Park ranger','adult park ranger',HAIR_TIED,'a ranger uniform with a wide-brim hat'],
+    ['superhero','Superhero (original)','young superhero',HAIR_SHORT,'an original bold-colored suit with a cape and a unique emblem'],
+    ['villain','Villain (original)','adult villain',HAIR_SHORT,'a dramatic dark coat with sharp angles and a cold smile']
+  ],
+  'Fantasy people': [
+    ['knight','Knight','adult knight',HAIR_SHORT,'polished plate armor, a tabard and a longsword'],
+    ['warrior-queen','Warrior queen','adult warrior queen',HAIR_LONG,'gold-trimmed armor and a crown of hammered metal'],
+    ['king','King','adult king',HAIR_SHORT,'royal robes, a jeweled crown and a scepter'],
+    ['queen','Queen','adult queen',HAIR_LONG,'an elegant gown, a jeweled crown and a regal stance'],
+    ['prince','Prince','young prince',HAIR_SHORT,'a tailored royal coat with gold embroidery'],
+    ['princess','Princess','young princess',HAIR_LONG,'a flowing gown and a delicate tiara'],
+    ['wizard','Wizard','elder wizard',HAIR_LONG,'star-patterned robes and a carved staff'],
+    ['sorceress','Sorceress','adult sorceress',HAIR_LONG,'dark robes with glowing runes and a spell orb'],
+    ['witch','Witch','young witch',HAIR_LONG,'a pointed hat, a flowing cape and a broom'],
+    ['ranger','Forest ranger archer','young archer',HAIR_TIED,'a green hooded cloak, a longbow and a quiver'],
+    ['elf','Elf','young elf',HAIR_LONG,'pointed ears, leaf-woven armor and a silver circlet'],
+    ['dwarf','Dwarf smith','adult dwarf blacksmith',HAIR_SHORT,'a braided beard, a leather apron and a forge hammer'],
+    ['paladin','Paladin','adult paladin',HAIR_SHORT,'shining armor with a glowing holy shield'],
+    ['monk','Monk','young monk',HAIR_SHORT,'simple saffron robes and prayer beads'],
+    ['samurai','Samurai','adult samurai',HAIR_TIED,'lacquered armor and a katana'],
+    ['ninja','Ninja','young ninja',HAIR_SHORT,'dark shinobi garb with a face wrap'],
+    ['viking','Viking','adult Viking warrior',HAIR_LONG,'fur-trimmed leather, a round shield and an axe'],
+    ['bard','Bard','young bard',HAIR_LONG,'a colorful doublet and a lute'],
+    ['alchemist','Alchemist','adult alchemist',HAIR_TIED,'a stained apron and bubbling glass vials'],
+    ['necromancer','Necromancer','adult necromancer',HAIR_LONG,'tattered dark robes and a bone staff'],
+    ['griot','Griot storyteller','elder griot storyteller',HAIR_SHORT,'flowing robes and a kora'],
+    ['ancient-pharaoh','Ancient pharaoh','adult pharaoh',HAIR_SHORT,'a golden collar, a royal headdress and a crook']
+  ],
+  'Sci-fi and future': [
+    ['cyberpunk-hacker','Cyberpunk hacker','young hacker',HAIR_SHORT,'a neon-lit techwear jacket and a holographic visor'],
+    ['space-marine','Space marine','adult space marine',HAIR_SHORT,'heavy armored power suit with a glowing visor'],
+    ['bounty-hunter','Bounty hunter','adult bounty hunter',HAIR_SHORT,'scuffed armor plates, a long coat and a blaster'],
+    ['mech-pilot','Mech pilot','young mech pilot',HAIR_SHORT,'a form-fitting pilot suit and a helmet'],
+    ['starship-captain','Starship captain','adult starship captain',HAIR_SHORT,'a crisp command uniform with insignia'],
+    ['cyborg','Cyborg','young cyborg',HAIR_SHORT,'sleek cybernetic limbs and glowing seams'],
+    ['time-traveler','Time traveler','adult time traveler',HAIR_TIED,'a coat mixing eras and a brass pocket device'],
+    ['scientist','Scientist','adult scientist',HAIR_TIED,'a lab coat, safety glasses and a glowing sample'],
+    ['inventor','Inventor','young inventor',HAIR_TIED,'goggles on the forehead and a tool belt'],
+    ['android','Android','adult android',HAIR_SHORT,'a smooth synthetic face with subtle panel lines'],
+    ['wasteland-survivor','Wasteland survivor','adult wasteland survivor',HAIR_TIED,'patched gear, a scarf and dust goggles'],
+    ['afrofuturist-royal','Afrofuturist royal','adult Afrofuturist royal',HAIR_LONG,'gold-and-indigo regalia with glowing tech jewelry']
+  ],
+  'Everyday and modern': [
+    ['student','Student','teenage student',HAIR_SHORT,'a backpack and a school hoodie'],
+    ['teacher','Teacher','adult teacher',HAIR_TIED,'a cardigan and an armful of books'],
+    ['doctor','Doctor','adult doctor',HAIR_SHORT,'scrubs, a white coat and a stethoscope'],
+    ['nurse','Nurse','adult nurse',HAIR_TIED,'scrubs and a kind, steady smile'],
+    ['chef','Chef','adult chef',HAIR_SHORT,'a white chef\'s jacket and a tall toque'],
+    ['farmer','Farmer','adult farmer',HAIR_SHORT,'overalls, work boots and a straw hat'],
+    ['mechanic','Mechanic','adult mechanic',HAIR_SHORT,'grease-marked coveralls and a wrench'],
+    ['artist','Painter','young painter',HAIR_TIED,'a paint-splattered smock and a brush'],
+    ['photographer','Photographer','young photographer',HAIR_SHORT,'a vintage camera on a strap'],
+    ['entrepreneur','Entrepreneur','adult entrepreneur',HAIR_SHORT,'a tailored suit and confident stance'],
+    ['grandparent','Grandparent','elder grandparent',HAIR_SHORT,'a warm cardigan and reading glasses'],
+    ['baby','Baby','young baby',HAIR_SHORT,'a soft onesie and a curious gaze'],
+    ['gamer','Gamer','teenage gamer',HAIR_SHORT,'a headset and an RGB-lit hoodie'],
+    ['content-creator','Content creator','young content creator',HAIR_SHORT,'trendy streetwear and a ring light glow']
+  ],
+  'Music, dance and sports': [
+    ['dj','DJ','young DJ',HAIR_SHORT,'headphones, streetwear and turntables'],
+    ['rapper','Rapper','young rapper',HAIR_SHORT,'designer streetwear, chains and a microphone'],
+    ['singer','Singer','adult singer',HAIR_LONG,'a stage outfit under spotlights and a vintage microphone'],
+    ['jazz-musician','Jazz musician','adult jazz musician',HAIR_SHORT,'a sharp suit and a saxophone'],
+    ['drummer','Drummer','young drummer',HAIR_SHORT,'a tank top and drumsticks in motion'],
+    ['guitarist','Guitarist','young guitarist',HAIR_LONG,'a leather jacket and an electric guitar'],
+    ['ballet-dancer','Ballet dancer','young ballet dancer',HAIR_TIED,'a leotard and tutu, mid-pose'],
+    ['street-dancer','Street dancer','young street dancer',HAIR_SHORT,'baggy streetwear, mid-move'],
+    ['basketball-player','Basketball player','young basketball player',HAIR_SHORT,'a jersey and high-top sneakers'],
+    ['soccer-player','Soccer player','young soccer player',HAIR_SHORT,'a team kit and cleats'],
+    ['boxer','Boxer','adult boxer',HAIR_SHORT,'boxing gloves and wrapped hands'],
+    ['skateboarder','Skateboarder','teenage skateboarder',HAIR_SHORT,'a beanie, baggy jeans and a skateboard'],
+    ['surfer','Surfer','young surfer',HAIR_LONG,'a wetsuit and a surfboard'],
+    ['martial-artist','Martial artist','young martial artist',HAIR_TIED,'a training gi and a black belt']
+  ],
+  'Myth and spirit': [
+    ['angel','Angel','adult angel',HAIR_LONG,'luminous feathered wings and flowing white robes'],
+    ['fallen-angel','Fallen angel','adult fallen angel',HAIR_LONG,'dark tattered wings and a broken halo'],
+    ['vampire','Vampire','adult vampire',HAIR_LONG,'an elegant dark coat and pale glowing eyes'],
+    ['werewolf-human','Werewolf (human form)','young werewolf',HAIR_SHORT,'torn clothes, faint claws and golden eyes'],
+    ['mermaid','Merperson','young merperson',HAIR_LONG,'a shimmering scaled tail and shell jewelry'],
+    ['fairy','Fairy','young fairy',HAIR_LONG,'gossamer wings and a petal outfit'],
+    ['oracle','Oracle','elder oracle',HAIR_LONG,'veils, glowing eyes and a smoking bowl'],
+    ['shaman','Spirit healer','elder spirit healer',HAIR_LONG,'herbs, beads and a carved staff'],
+    ['orisha-inspired','Ocean goddess','adult ocean goddess',HAIR_LONG,'flowing blue-and-white robes and pearls'],
+    ['sun-deity','Sun deity','adult sun deity',HAIR_LONG,'radiant gold armor and a halo of sunlight'],
+    ['moon-priestess','Moon priestess','young moon priestess',HAIR_LONG,'silver robes and crescent jewelry'],
+    ['ghost','Ghost','young ghost',HAIR_LONG,'a translucent glowing form']
+  ]
+};
+const CREATURES = {
+  'Animals': [
+    ['lion','Lion','A majestic lion with a full golden mane and calm, powerful eyes'],
+    ['black-panther-cat','Black panther (big cat)','A sleek black panther with glossy fur and bright green eyes'],
+    ['wolf','Wolf','A silver-gray wolf with alert ears and intelligent amber eyes'],
+    ['bear','Bear','A large brown bear with thick fur and a gentle expression'],
+    ['elephant','Elephant','A wise elephant with textured gray skin and long ivory-free tusks'],
+    ['gorilla','Gorilla','A silverback gorilla with a thoughtful, protective presence'],
+    ['owl','Owl','A great horned owl with wide amber eyes'],
+    ['eagle','Eagle','A soaring eagle with spread wings and sharp golden eyes'],
+    ['cat','House cat','A curious tabby cat with bright eyes and a fluffy tail'],
+    ['dog','Dog','A loyal golden dog with a wagging tail and friendly face'],
+    ['bunny','Bunny','A fluffy bunny with long ears and a twitching nose'],
+    ['panda','Panda','A round, playful panda munching bamboo'],
+    ['red-panda','Red panda','A red panda with russet fur and a ringed tail'],
+    ['dolphin','Dolphin','A playful dolphin leaping from the water'],
+    ['octopus','Octopus','A clever octopus with curling, color-shifting arms'],
+    ['turtle','Sea turtle','A wise old sea turtle with a patterned shell'],
+    ['horse','Horse','A strong horse with a flowing mane'],
+    ['giraffe','Giraffe','A tall giraffe with patterned coat and gentle eyes'],
+    ['frog','Frog','A bright green tree frog with big round eyes'],
+    ['butterfly','Butterfly','A large luminous butterfly with patterned wings']
+  ],
+  'Fantasy creatures': [
+    ['dragon','Dragon','An original dragon with iridescent scales, horned crest and glowing eyes'],
+    ['baby-dragon','Baby dragon','A tiny, chubby baby dragon with soft scales and stubby wings'],
+    ['phoenix','Phoenix','A phoenix with flame-gold feathers and a trail of embers'],
+    ['unicorn','Unicorn','A white unicorn with a pearl horn and a rainbow-sheen mane'],
+    ['pegasus','Pegasus','A winged horse with broad white feathered wings'],
+    ['griffin','Griffin','A griffin with an eagle\'s head and wings and a lion\'s body'],
+    ['kitsune','Nine-tailed fox spirit','A white fox spirit with nine glowing tails'],
+    ['golem','Stone golem','A towering stone golem with moss and glowing runes'],
+    ['treant','Tree giant','A gentle tree giant with bark skin and leafy crown'],
+    ['sea-serpent','Sea serpent','A coiling sea serpent with shimmering scales'],
+    ['slime','Slime buddy','A cute translucent slime creature with a big smile'],
+    ['forest-spirit','Forest spirit','A small glowing forest spirit with a leaf-shaped head'],
+    ['shadow-beast','Shadow beast','A smoky shadow creature with glowing eyes'],
+    ['sphinx','Sphinx','A regal sphinx with a lion\'s body and a calm, knowing face'],
+    ['thunderbird','Thunderbird','A giant thunderbird crackling with lightning']
+  ],
+  'Robots and tech': [
+    ['mech','Giant mech','A towering original battle mech with armored plating and glowing core'],
+    ['robot-dog','Robot dog','A sleek four-legged robot dog with a glowing visor'],
+    ['drone-buddy','Drone buddy','A small hovering drone with one big friendly eye'],
+    ['repair-bot','Repair bot','A boxy repair robot with many tool arms'],
+    ['ai-hologram','AI hologram','A friendly AI shown as a glowing holographic figure'],
+    ['steampunk-automaton','Steampunk automaton','A brass clockwork automaton with visible gears'],
+    ['battle-droid','Battle droid','An original armored battle droid with a glowing visor'],
+    ['nano-swarm','Nanobot swarm','A shimmering swarm of nanobots forming a shape']
+  ]
+};
+const CHARACTER_GROUPS = {'People': ['boy','girl','man','woman','elder-man','elder-woman']};
+Object.entries(PEOPLE).forEach(([g, list]) => {
+  CHARACTER_GROUPS[g] = list.map(([key, name, who, hair, rest]) => {
+    CHARACTER_PRESETS[key] = {name, person: {who, hair, rest}};
+    return key;
+  });
+});
+Object.entries(CREATURES).forEach(([g, list]) => {
+  CHARACTER_GROUPS[g] = list.map(([key, name, look]) => { CHARACTER_PRESETS[key] = {name, look: look + '; a fully original design'}; return key; });
+});
+CHARACTER_GROUPS['Companions'] = ['tiger','fox','robot','fantasy'];
+function buildCharacterMenu(keep) {
+  const sel = $('character'), q = ($('char-search').value || '').trim().toLowerCase();
+  const opt = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; return o; };
+  const nodes = [opt('', 'Use my scene description')];
+  let count = 0;
+  Object.entries(CHARACTER_GROUPS).forEach(([g, keys]) => {
+    const match = keys.filter(k => !q || CHARACTER_PRESETS[k].name.toLowerCase().includes(q) || g.toLowerCase().startsWith(q) || k === keep);
+    if (!match.length) return;
+    const og = document.createElement('optgroup'); og.label = g;
+    match.forEach(k => { og.append(opt(k, CHARACTER_PRESETS[k].name)); if (k !== keep) count++; });
+    nodes.push(og);
+  });
+  nodes.push(opt('custom', 'Custom character'));
+  sel.replaceChildren(...nodes);
+  sel.value = keep in CHARACTER_PRESETS ? keep : '';
+  return count;
+}
+
 // ---------- heritage ----------
 const HERITAGE_GROUPS = {
   'Africa & diaspora': ['African American','Black British','West African','Nigerian','Ghanaian','Senegalese','East African','Ethiopian','Kenyan','Somali','North African','South African'],
@@ -531,43 +708,86 @@ function resolveHeritage() {
   }
   return pick(ALL_HERITAGES);
 }
-const RESPECT = 'Show their heritage through natural, respectful features; avoid caricature or exaggerated stereotypes';
+const RESPECT = 'Depict them authentically and with dignity, with natural features true to their heritage; no caricature';
+
+// Typical appearance by heritage, used when skin tone or hair texture is left on "Any",
+// and to keep the random character's hair, eyes and outfit consistent with their heritage.
+const AFRICAN = {skin: ['warm brown skin', 'rich medium-brown skin', 'deep brown skin', 'dark brown skin'], tex: ['coily', 'coily', 'curly'],
+  hairColor: ['black', 'black', 'dark brown'], eyes: ['deep brown eyes', 'dark brown eyes', 'warm brown eyes'],
+  styles: ['in locs', 'in box braids', 'in cornrows', 'in a rounded afro', 'in two-strand twists', 'in Bantu knots', 'cropped short with a clean fade', 'in a twist-out', 'in a high puff'],
+  outfits: ['an Ankara-print jacket', 'a kente-patterned cloak over light armor', 'a mudcloth-patterned vest']};
+const TRAITS = {
+  'Africa & diaspora': AFRICAN,
+  'Caribbean': {...AFRICAN, skin: ['light brown skin', 'warm brown skin', 'deep brown skin', 'dark brown skin'], tex: ['coily', 'curly', 'curly'], outfits: ['a bright madras-plaid shirt', 'a carnival-feathered festival outfit']},
+  'East Asia': {skin: ['fair skin', 'light skin', 'light golden skin'], tex: ['straight', 'straight', 'wavy'], hairColor: ['black', 'jet-black', 'dark brown'], eyes: ['dark brown eyes', 'deep brown eyes'], styles: ['cropped short', 'long and straight', 'in a high ponytail', 'in twin buns', 'with blunt bangs'], outfits: ['a layered hanfu robe with wide sleeves', 'a modern hanbok-inspired jacket', 'a jade pendant over a linen tunic']},
+  'Southeast Asia': {skin: ['light golden skin', 'warm tan skin', 'medium brown skin'], tex: ['straight', 'wavy'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'deep brown eyes'], styles: ['cropped short', 'long and flowing', 'tied back with a cord', 'in a low bun'], outfits: ['a batik-patterned shirt', 'a woven sarong wrap']},
+  'South Asia': {skin: ['light brown skin', 'warm brown skin', 'deep brown skin'], tex: ['straight', 'wavy', 'wavy'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'deep brown eyes', 'hazel eyes'], styles: ['in a long braid', 'long and flowing', 'cropped short', 'tied back'], outfits: ['an embroidered sari-inspired battle wrap', 'a long kurta-style coat']},
+  'Middle East': {skin: ['light olive skin', 'olive skin', 'light brown skin'], tex: ['wavy', 'curly', 'straight'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'hazel eyes', 'amber eyes'], styles: ['long and flowing', 'cropped short', 'tied back with a cord'], outfits: ['a hooded desert robe with brass trinkets', 'an embroidered kaftan-style coat']},
+  'Europe': {skin: ['fair skin', 'light skin', 'light olive skin'], tex: ['straight', 'wavy', 'curly'], hairColor: ['black', 'dark brown', 'brown', 'auburn', 'blonde', 'red'], eyes: ['blue eyes', 'green eyes', 'gray eyes', 'brown eyes', 'hazel eyes'], styles: ['cropped short', 'long and flowing', 'in a braid', 'tied back with a cord'], outfits: ['a fur-trimmed northern tunic', 'a wool coat with brass buttons']},
+  'Latin America': {skin: ['light olive skin', 'warm tan skin', 'light brown skin', 'warm brown skin'], tex: ['wavy', 'curly', 'straight'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'warm brown eyes', 'hazel eyes'], styles: ['long and flowing', 'in a thick braid', 'cropped short', 'loose and wavy'], outfits: ['a woven poncho with bright stripes', 'an embroidered blouse-style top']},
+  'Indigenous peoples': {skin: ['warm tan skin', 'light brown skin', 'warm brown skin'], tex: ['straight', 'wavy'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'deep brown eyes'], styles: ['in long braids', 'long and flowing', 'tied back'], outfits: ['a hand-woven patterned wrap', 'a beaded leather vest']},
+  'Pacific Islands': {skin: ['warm brown skin', 'rich medium-brown skin', 'deep brown skin'], tex: ['wavy', 'curly'], hairColor: ['black', 'dark brown'], eyes: ['dark brown eyes', 'deep brown eyes'], styles: ['long and wavy', 'in a top bun', 'cropped short'], outfits: ['a tapa-patterned voyager wrap', 'a flower lei over a linen shirt']}
+};
+// Heritages that need different traits from their menu group, or that only come from style matching
+const TRAIT_OVERRIDES = {
+  'North African': 'Middle East', 'Afro-Latino': 'Caribbean', 'Afro-Brazilian': 'Caribbean', 'Puerto Rican': 'Latin America', 'Cuban': 'Latin America', 'Dominican': 'Caribbean',
+  'Egyptian': 'Middle East', 'Nubian': 'Africa & diaspora', 'Sudanese': 'Africa & diaspora', 'Belgian': 'Europe', 'Russian': 'Europe', 'Ukrainian': 'Europe',
+  'Norwegian': 'Europe', 'Icelandic': 'Europe', 'Mexican-American': 'Latin America', 'Irish-American': 'Europe', 'Chinese-American': 'East Asia', 'Brazilian': 'Latin America'
+};
+function traitsFor(heritage) {
+  const region = TRAIT_OVERRIDES[heritage] || Object.keys(HERITAGE_GROUPS).find(g => HERITAGE_GROUPS[g].includes(heritage));
+  return TRAITS[region] || null; // mixed heritage: no assumptions
+}
+// African American reads more reliably to image models as "Black American"
+const heritageWords = h => h === 'African American' ? 'African American (Black American)' : h === 'Black British' ? 'Black British' : h;
 function presetLook(key) {
   const p = CHARACTER_PRESETS[key];
   if (!p) return '';
   if (!p.person) return p.look;
-  const h = resolveHeritage(), skin = $('skin').value, hair = p.person.hair[$('texture').value || 'any'];
+  const h = resolveHeritage(), t = traitsFor(h);
+  const skin = $('skin').value || (t ? pick(t.skin) : '');
+  const hair = p.person.hair[$('texture').value || (t ? pick(t.tex) : 'any')];
   const [first, ...rest] = p.person.who.split(' '); // e.g. "young" + "girl explorer"
   const an = /^[aeiou]/i.test(first) ? 'An' : 'A';
-  return `${an} ${first} ${h} ${rest.join(' ')} with ${skin ? skin + ', ' : ''}${hair}, ${p.person.rest}. ${RESPECT}`;
+  return `${an} ${first} ${heritageWords(h)} ${rest.join(' ')} with ${skin ? skin + ', ' : ''}${hair}, ${p.person.rest}. ${RESPECT}`;
 }
 
 // ---------- random character builder ----------
 const POOL = {
   age: ['child','teen','young adult','adult','middle-aged','elder'],
   build: ['slight and wiry','tall and lanky','short and sturdy','broad-shouldered','athletic','soft and round','graceful and willowy'],
-  face: ['a round, freckled face','sharp angular features','soft, gentle features','a strong jaw and thick brows','high cheekbones','a small scar across one brow','dimples and a wide smile'],
+  face: ['a round, open face','sharp angular features','soft, gentle features','a strong jaw and thick brows','high cheekbones','a small scar across one brow','dimples and a wide smile'],
+  fantasyHair: ['silver','indigo-tinted','teal-streaked','cloud-white'],
+  fantasyEyes: ['glowing cyan eyes','violet eyes','one blue and one gold eye'],
+  outfitAny: ['a futuristic white tactical jacket with glowing seams','a patched explorer coat with many pockets','a sleek black streetwear hoodie with neon trim','a scholar\'s long coat with ink-stained cuffs','light leather armor with a woven sash','a hooded travel cloak'],
   hairColor: ['black','dark brown','silver','copper','indigo-tinted','bleached blonde','cloud-white','teal-streaked','auburn','jet-black'],
   hairStyle: ['worn in braids','in a messy topknot','cropped short','long and flowing','shaved at the sides','tied back with a cord','in a high ponytail','loose and wild','in twin buns with ribbons','pinned up with jade pins','with golden cuffs'],
   eyes: ['amber eyes','storm-gray eyes','bright green eyes','deep brown eyes','violet eyes','one blue and one gold eye','glowing cyan eyes'],
   outfit: ['a layered hanfu robe with wide sleeves','a futuristic white tactical jacket with glowing seams','a kente-patterned cloak over light armor','a hooded desert robe with brass trinkets','a patched explorer coat with many pockets','an embroidered sari-inspired battle wrap','a fur-trimmed northern tunic','a sleek black streetwear hoodie with neon trim','a carnival-feathered festival outfit','a tapa-patterned voyager wrap','a scholar\'s long coat with ink-stained cuffs','dragon-scale armor with silk sash'],
-  extra: ['carrying a carved staff','with a tiny spirit companion on their shoulder','wearing glowing tattoo markings','holding an old map','with a cybernetic arm','wearing a jade pendant','with a satchel of scrolls','wielding a crystal blade','wearing round brass goggles','with paint-splattered hands'],
+  extra: ['carrying a carved staff','with a tiny spirit companion on their shoulder','wearing glowing tattoo markings','holding an old map','with a cybernetic arm','wearing a carved pendant','with a satchel of scrolls','wielding a crystal blade','wearing round brass goggles','with paint-splattered hands'],
   mood: ['fearless and curious','quiet and wise','mischievous and quick','gentle but determined','proud and fierce','dreamy and kind','calm and focused']
 };
 const pick = a => a[Math.floor(Math.random() * a.length)];
 function randomCharacter() {
-  const age = pick(POOL.age), h = resolveHeritage(), skin = $('skin').value, tex = $('texture').value;
+  const age = pick(POOL.age), h = resolveHeritage(), t = traitsFor(h);
+  const skin = $('skin').value || (t ? pick(t.skin) : ''), tex = $('texture').value || (t ? pick(t.tex) : '');
+  const fantasy = Math.random() < 0.15; // occasional fantasy color, never a change of skin or features
   const WHO = {
     child: ['young boy','young girl'], teen: ['teenage boy','teenage girl','teen'],
     'young adult': ['young man','young woman','young wanderer'], adult: ['man','woman','traveler'],
     'middle-aged': ['middle-aged man','middle-aged woman'], elder: ['elder man','elder woman','elder sage']
   };
-  let who = pick(WHO[age]), lead = h;
+  let who = pick(WHO[age]), lead = heritageWords(h);
   const m = who.match(/^(young|teenage|middle-aged|elder) (.+)$/);
-  if (m) { lead = m[1] + ' ' + h; who = m[2]; } // "a young Korean man", not "a Korean young man"
+  if (m) { lead = m[1] + ' ' + heritageWords(h); who = m[2]; } // "a young Korean man", not "a Korean young man"
   const an = /^[aeiou]/i.test(lead) ? 'An' : 'A';
-  const hair = `${pick(POOL.hairColor)} ${tex ? tex + ' ' : ''}hair ${pick(POOL.hairStyle)}`;
-  return `${an} ${lead} ${who}, ${pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${pick(POOL.face)}, ${hair} and ${pick(POOL.eyes)}, dressed in ${pick(POOL.outfit)}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
+  // Hair, eyes and outfit follow the heritage's typical range; fantasy colors appear only occasionally
+  const color = fantasy ? pick(POOL.fantasyHair) : pick(t ? t.hairColor : POOL.hairColor);
+  const style = pick(t ? t.styles : POOL.hairStyle);
+  const hair = `${color} ${tex ? tex + ' ' : ''}hair ${style}`;
+  const eyes = fantasy && Math.random() < 0.5 ? pick(POOL.fantasyEyes) : pick(t ? t.eyes : POOL.eyes);
+  const outfit = t && Math.random() < 0.4 ? pick(t.outfits) : pick(POOL.outfitAny);
+  return `${an} ${lead} ${who}, ${pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${pick(POOL.face)}, ${hair} and ${eyes}, dressed in ${outfit}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
 }
 function setRandomCharacter() {
   $('character').value = 'custom';
@@ -624,6 +844,7 @@ function save() {
   const values = Object.fromEntries(FIELDS.map(k => [k, $(k).value]));
   CHECKS.forEach(k => values[k] = $(k).checked);
   values.blend = [...$('blend').querySelectorAll('input:checked')].map(c => c.value);
+  values.lookAuto = $('character-look').dataset.auto || '';
   try { localStorage.setItem('ether-studio-v2', JSON.stringify({selected, weights, group, values})); } catch (e) {}
 }
 function setSelect(el, v) { if ([...el.options].some(o => (o.value || o.text) === v)) el.value = v; }
@@ -649,6 +870,8 @@ function restore() {
   });
   buildLocations(typeof v.location === 'string' ? v.location : '');
   CHECKS.forEach(k => { if (typeof v[k] === 'boolean') $(k).checked = v[k]; });
+  if (typeof v.lookAuto === 'string') $('character-look').dataset.auto = v.lookAuto;
+  else if (CHARACTER_PRESETS[v.character]?.person) $('character-look').dataset.auto = 'preset';
   if (Array.isArray(v.blend)) $('blend').querySelectorAll('input').forEach(c => c.checked = v.blend.includes(c.value));
   const max = +$('mode').value;
   selected = Array.isArray(state.selected) ? [...new Set(state.selected)].filter(getStyle).slice(0, max) : ['i8'];
@@ -696,6 +919,10 @@ function buildLocations(keep) {
 function location() {
   const v = $('location').value;
   return v === 'custom' ? clean($('location-custom').value) : v;
+}
+function hasPerson() {
+  const p = CHARACTER_PRESETS[$('character').value];
+  return !!(p && clean($('character-look').value) && (p.person || $('character').value === 'custom'));
 }
 function characters() {
   const list = [];
@@ -745,6 +972,7 @@ function chatPrompt() {
   if (chars.length) {
     lines.push('Characters:');
     chars.forEach(c => lines.push(`- ${c.text}.${c.ref ? ` ${c.name}'s character sheet is attached; match it closely for face, proportions, markings and colors.` : ''}`));
+    if (hasPerson()) lines.push(`Keep each person's skin tone, hair texture and facial features exactly as described, whatever the art style; don't lighten skin, straighten or loosen hair, or swap in generic features to fit the style.${selected.length && MONO.has(selected[0]) ? ' In monochrome, show darker skin with darker tones or screen tones, never blank white.' : ''}`);
   }
   if (s.length === 1) lines.push(`Style: ${s[0].name} — ${lower1(clean(s[0].description))}.`);
   else if (s.length > 1) {
@@ -766,6 +994,7 @@ function mjPrompt() {
   const s = selected.map(getStyle), parts = [clean($('scene').value)];
   if (location()) parts.push('setting: ' + location());
   characters().forEach(c => parts.push(clean(c.text)));
+  if (hasPerson()) parts.push('true-to-description skin tone and hair texture');
   if (s.length === 1) parts.push(`${s[0].name.toLowerCase()} style, ${lower1(clean(s[0].description))}`);
   else if (s.length > 1) {
     parts.push(`primarily ${s[0].name.toLowerCase()} style (${lower1(clean(s[0].description))})`);
@@ -900,7 +1129,7 @@ function renderCharacters() {
   const grid = $('character-previews');
   if (grid.dataset.selected !== $('character').value || !grid.children.length) {
   grid.dataset.selected = $('character').value;
-  grid.replaceChildren(...Object.entries(CHARACTER_PRESETS).map(([key,preset]) => {
+  grid.replaceChildren(...Object.entries(CHARACTER_PRESETS).filter(([key]) => THUMBNAILS.character && THUMBNAILS.character[key]).map(([key,preset]) => {
     const b = document.createElement('button'); b.type='button'; b.className='character-choice';
     b.setAttribute('aria-label', 'Choose '+preset.name); b.setAttribute('aria-pressed', String($('character').value===key));
     const image=document.createElement('span'); image.setAttribute('aria-hidden','true'); decorateThumbnail(image,'character',key);
@@ -954,6 +1183,10 @@ $('surprise-blend').onclick = () => {
   render(); save();
 };
 $('new-character').onclick = setRandomCharacter;
+$('char-search').addEventListener('input', () => {
+  const n = buildCharacterMenu($('character').value);
+  $('status').textContent = $('char-search').value.trim() ? `${n} character${n === 1 ? '' : 's'} match. Open the Scene character menu to choose.` : '';
+});
 // Changing heritage, skin or hair rewrites the character, unless you've typed your own description
 ['heritage','skin','texture'].forEach(k => $(k).addEventListener('change', () => {
   const auto = $('character-look').dataset.auto, preset = CHARACTER_PRESETS[$('character').value];
@@ -999,6 +1232,7 @@ document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => copy
 new MutationObserver(() => { const t = $('status').textContent; if (t) $('dock-status').textContent = t; }).observe($('status'), {childList: true, characterData: true, subtree: true});
 
 buildHeritageMenu();
+buildCharacterMenu('');
 buildLocations('');
 restore();
 fillStarterLooks(false);
