@@ -250,7 +250,35 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
         <div><label for="es-texture">Hair texture</label><select id="es-texture">
           <option value="">Any</option><option value="straight">Straight</option><option value="wavy">Wavy</option><option value="curly">Curly</option><option value="coily">Coily</option><option value="locs">Dreadlocks (locs)</option>
         </select></div>
+        <div><label for="es-height">Height</label><select id="es-height">
+          <option value="">Any</option><option value="petite">Petite</option><option value="short">Short</option><option value="average height">Average height</option><option value="tall">Tall</option><option value="very tall">Very tall</option>
+        </select></div>
+        <div><label for="es-body">Body type</label><select id="es-body">
+          <option value="">Any</option><option value="slim">Slim</option><option value="lanky">Lanky</option><option value="average build">Average build</option><option value="athletic">Athletic</option><option value="muscular">Muscular</option><option value="stocky">Stocky</option><option value="curvy">Curvy</option><option value="heavyset">Heavyset</option><option value="plus-size">Plus-size</option>
+        </select></div>
+        <div><label for="es-haircolor">Hair color</label><select id="es-haircolor">
+          <option value="">Any</option><option value="jet-black">Black</option><option value="dark brown">Dark brown</option><option value="brown">Brown</option><option value="auburn">Auburn</option><option value="red">Red</option><option value="blonde">Blonde</option><option value="platinum blonde">Platinum</option><option value="gray">Gray</option><option value="silver">Silver</option><option value="white">White</option><option value="dark with honey-blonde highlights">Honey highlights</option><option value="dyed copper">Copper dyed</option><option value="dyed burgundy">Burgundy dyed</option><option value="dyed blue">Blue dyed</option><option value="dyed pink">Pink dyed</option><option value="dyed purple">Purple dyed</option>
+        </select></div>
+        <div><label for="es-eyecolor">Eye color</label><select id="es-eyecolor">
+          <option value="">Any</option><option value="dark brown eyes">Dark brown</option><option value="warm brown eyes">Brown</option><option value="hazel eyes">Hazel</option><option value="amber eyes">Amber</option><option value="green eyes">Green</option><option value="blue eyes">Blue</option><option value="gray eyes">Gray</option><option value="one brown and one hazel eye">Two different colors</option>
+        </select></div>
+        <div><label for="es-facialhair">Facial hair</label><select id="es-facialhair">
+          <option value="">Any</option><option value="clean-shaven">Clean-shaven</option><option value="light stubble">Stubble</option><option value="a mustache">Mustache</option><option value="a goatee">Goatee</option><option value="a short, neat beard">Short beard</option><option value="a full beard">Full beard</option><option value="a long beard">Long beard</option>
+        </select></div>
+        <div><label for="es-glasses">Glasses</label><select id="es-glasses">
+          <option value="">Any</option><option value="no glasses">None</option><option value="round glasses">Round glasses</option><option value="square-framed glasses">Square glasses</option><option value="sunglasses">Sunglasses</option><option value="goggles pushed up on the forehead">Goggles on forehead</option>
+        </select></div>
+        <div><label for="es-skindetail">Skin details</label><select id="es-skindetail">
+          <option value="">Any</option><option value="freckles">Freckles</option><option value="vitiligo patches">Vitiligo</option><option value="a birthmark on one cheek">Birthmark</option><option value="a small beauty mark">Beauty mark</option><option value="dimples">Dimples</option><option value="a small scar across one brow">Scar</option><option value="warm smile lines">Smile lines</option>
+        </select></div>
+        <div><label for="es-bodyart">Tattoos and piercings</label><select id="es-bodyart">
+          <option value="">Any</option><option value="tattoos on the arms">Arm tattoos</option><option value="a full sleeve tattoo">Sleeve tattoo</option><option value="a small tattoo on the wrist">Small tattoo</option><option value="ear piercings">Ear piercings</option><option value="a nose ring">Nose ring</option><option value="glowing tattoo markings">Glowing markings</option>
+        </select></div>
+        <div><label for="es-mobility">Mobility and aids</label><select id="es-mobility">
+          <option value="">Any</option><option value="using a wheelchair">Wheelchair user</option><option value="with a prosthetic leg">Prosthetic leg</option><option value="with a prosthetic arm">Prosthetic arm</option><option value="wearing hearing aids">Hearing aids</option><option value="walking with a cane">Walks with a cane</option><option value="using forearm crutches">Uses crutches</option><option value="with a guide dog at their side">Guide dog</option>
+        </select></div>
       </div>
+      <button type="button" id="es-appearance-reset" class="chip" style="margin-top:10px">Reset appearance to Any</button>
     </details>
     <p class="note" style="margin:6px 0 0">Heritage, skin tone and hair texture shape the people presets and the random character. Ether and Element are never changed. Leave skin tone and hair texture on Any to use a natural range for the heritage.</p>
     <div id="es-character-previews" class="character-previews" role="group" aria-label="Character previews"></div>
@@ -770,7 +798,10 @@ function presetLook(key) {
   const tx = $('texture').value || (t ? pick(t.tex) : 'any'), hair = p.person.hair[tx] || p.person.hair.any;
   const [first, ...rest] = p.person.who.split(' '); // e.g. "young" + "girl explorer"
   const an = /^[aeiou]/i.test(first) ? 'An' : 'A';
-  return `${an} ${first} ${heritageWords(h)} ${rest.join(' ')} with ${skin ? skin + ', ' : ''}${hair}, ${p.person.rest}. ${RESPECT}`;
+  const a = appearance(), shape = a.shape ? `, ${a.shape},` : '';
+  const hc = a.hairColor ? ` (${a.hairColor})` : '';
+  const looks = [skin, hair + hc, a.eyes, ...a.details].filter(Boolean).join(', ');
+  return `${an} ${first} ${heritageWords(h)} ${rest.join(' ')}${shape} with ${looks}, ${p.person.rest}${a.mobility ? `, ${a.mobility}` : ''}. ${RESPECT}`;
 }
 
 // ---------- random character builder ----------
@@ -789,6 +820,14 @@ const POOL = {
   mood: ['fearless and curious','quiet and wise','mischievous and quick','gentle but determined','proud and fierce','dreamy and kind','calm and focused']
 };
 const pick = a => a[Math.floor(Math.random() * a.length)];
+// Extra appearance choices from "More appearance options"
+function appearance() {
+  const v = k => $(k).value;
+  const shape = [v('height'), v('body')].filter(Boolean).join(' and ').replace('average height and average build', 'average height and build');
+  const details = [v('facialhair'), v('glasses') === 'no glasses' ? '' : v('glasses'), v('skindetail'), v('bodyart')].filter(Boolean);
+  const mob = v('mobility');
+  return {shape, hairColor: v('haircolor'), eyes: v('eyecolor'), details, mobility: mob};
+}
 function randomCharacter() {
   const age = pick(POOL.age), h = resolveHeritage(), t = traitsFor(h);
   const skin = $('skin').value || (t ? pick(t.skin) : ''), tex = $('texture').value || (t ? pick(t.tex) : '');
@@ -803,14 +842,16 @@ function randomCharacter() {
   if (m) { lead = m[1] + ' ' + heritageWords(h); who = m[2]; } // "a young Korean man", not "a Korean young man"
   const an = /^[aeiou]/i.test(lead) ? 'An' : 'A';
   // Hair, eyes and outfit follow the heritage's typical range; fantasy colors appear only occasionally
-  const color = fantasy ? pick(POOL.fantasyHair) : pick(t ? t.hairColor : POOL.hairColor);
+  const a = appearance();
+  const color = a.hairColor || (fantasy ? pick(POOL.fantasyHair) : pick(t ? t.hairColor : POOL.hairColor));
   const style = pick(t ? t.styles : POOL.hairStyle);
   const hair = tex === 'locs'
     ? `${color} dreadlocks ${pick(['worn loose to the shoulders', 'tied up in a high bun', 'falling to the waist', 'with gold cuffs', 'pulled back with a wrap', 'cropped short'])}`
     : `${color} ${tex ? tex + ' ' : ''}hair ${style}`;
-  const eyes = fantasy && Math.random() < 0.5 ? pick(POOL.fantasyEyes) : pick(t ? t.eyes : POOL.eyes);
+  const eyes = a.eyes || (fantasy && Math.random() < 0.5 ? pick(POOL.fantasyEyes) : pick(t ? t.eyes : POOL.eyes));
   const outfit = t && Math.random() < 0.4 ? pick(t.outfits) : pick(POOL.outfitAny);
-  return `${an} ${lead} ${who}, ${pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${pick(POOL.face)}, ${hair} and ${eyes}, dressed in ${outfit}, ${pick(POOL.extra)}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
+  const face = a.details.length ? a.details.join(', ') : pick(POOL.face);
+  return `${an} ${lead} ${who}, ${a.shape || pick(POOL.build)}, with ${skin ? skin + ', ' : ''}${face}, ${hair} and ${eyes}, dressed in ${outfit}, ${pick(POOL.extra)}${a.mobility ? ', ' + a.mobility : ''}; ${pick(POOL.mood)} personality. A fully original character, not resembling anyone else in the scene. ${RESPECT}`;
 }
 function setRandomCharacter() {
   $('character').value = 'custom';
@@ -831,7 +872,7 @@ const STARTER = {
   }
 };
 const DEFAULTS = {1: [100], 2: [60, 40], 3: [50, 30, 20], 4: [40, 30, 20, 10]};
-const FIELDS = ['character','heritage','skin','texture','character-look','mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
+const FIELDS = ['character','heritage','skin','texture','height','body','haircolor','eyecolor','facialhair','glasses','skindetail','bodyart','mobility','character-look','mode','scene','loc-cat','location','location-custom','ratio','shot','angle','lens','light','film','motion','target','exclude',
   'form','ether-look','element-look','cue-earth','cue-water','cue-fire','cue-air','vtool','duration','cam','pace','action'];
 const CHECKS = ['character-ref','ether','ether-ref','element','element-ref','reroll'];
 
@@ -1239,12 +1280,16 @@ $('surprise-blend').onclick = () => {
   render(); save();
 };
 $('new-character').onclick = setRandomCharacter;
+$('appearance-reset').onclick = () => {
+  ['skin','texture','height','body','haircolor','eyecolor','facialhair','glasses','skindetail','bodyart','mobility'].forEach(k => $(k).value = '');
+  $('heritage').dispatchEvent(new Event('change'));
+};
 $('char-search').addEventListener('input', () => {
   const n = buildCharacterMenu($('character').value);
   $('status').textContent = $('char-search').value.trim() ? `${n} character${n === 1 ? '' : 's'} match. Open the Scene character menu to choose.` : '';
 });
 // Changing heritage, skin or hair rewrites the character, unless you've typed your own description
-['heritage','skin','texture'].forEach(k => $(k).addEventListener('change', () => {
+['heritage','skin','texture','height','body','haircolor','eyecolor','facialhair','glasses','skindetail','bodyart','mobility'].forEach(k => $(k).addEventListener('change', () => {
   const auto = $('character-look').dataset.auto, preset = CHARACTER_PRESETS[$('character').value];
   if (auto === 'random') $('character-look').value = randomCharacter();
   else if (preset && preset.person && auto === 'preset') $('character-look').value = presetLook($('character').value);
