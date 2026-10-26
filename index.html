@@ -345,6 +345,11 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
       <button type="button" id="es-reset-looks" class="chip" style="margin-top:10px">Restore starter descriptions</button>
     </details>
   </div>
+  <details class="panel" id="es-myrefs">
+    <summary>📎 My saved references <span class="note" id="es-myrefs-count"></span></summary>
+    <p class="note" style="margin:8px 0 0">Every reference sheet saved in this browser. Copy or download one for your image tool, or use it for a character here. <a href="characters.html#all-refs">Open on the Characters page →</a></p>
+    <div id="es-refgallery"></div>
+  </details>
 </section>
 
 <section class="card" id="step-scene" aria-label="Scene">
@@ -417,6 +422,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--es-field);borde
 </div>
 
 <script src="characters-store.js"></script>
+<script src="refs-gallery.js"></script>
 <script src="locations-data.js"></script>
 <script src="anime-data.js"></script>
 <script src="donghua-data.js"></script>
@@ -1369,7 +1375,8 @@ async function setSlotImage(slot, dataUrl) {
     buildCharacterMenu($('character').value);
   }
   $(SLOT_CHECK[slot]).checked = imgs.length > 0;
-  renderOutputs(); save(); renderSlot(slot);
+  renderOutputs(); save(); renderSlot(slot); updateRefCount();
+  if (refGallery && $('myrefs').open) refGallery.refresh();
 }
 function squareThumb(src) {
   return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => {
@@ -1437,6 +1444,39 @@ addEventListener('paste', e => {
 });
 $('character').addEventListener('change', () => { document.querySelector('.refslot[data-slot="scene"]').dataset.ticked = ''; renderSlot('scene'); });
 ['scene', 'ether', 'element'].forEach(renderSlot);
+// "My saved references" gallery: label presets by name and let any image become a character's sheet
+let refGallery = null;
+const refLabel = key => {
+  if (key.startsWith('studio:scene:')) { const k = key.slice(13); return {name: CHARACTER_PRESETS[k]?.name || k, sub: 'Studio preset'}; }
+  return null;
+};
+function mountRefGallery() {
+  if (refGallery) return refGallery.refresh();
+  refGallery = RefGallery.mount($('refgallery'), {
+    label: refLabel,
+    status: m => { $('status').textContent = m; },
+    extra: it => {
+      const s = document.createElement('select'); s.setAttribute('aria-label', 'Use this image for');
+      [['', 'Use for…'], ['scene', 'Scene character'], ['ether', 'Ether'], ['element', 'Element']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; s.append(o); });
+      s.onchange = async () => {
+        const slot = s.value; s.value = ''; if (!slot) return;
+        if (slot === 'scene' && !$('character').value) { $('status').textContent = 'Choose a scene character first.'; return; }
+        if (slot === 'ether' && !$('ether').checked) { $('ether').checked = true; renderCharacters(); }
+        if (slot === 'element' && !$('element').checked) { $('element').checked = true; renderCharacters(); }
+        await setSlotImage(slot, it.src); refGallery.refresh();
+        $('status').textContent = `Set as the reference sheet for ${slot === 'scene' ? CHARACTER_PRESETS[$('character').value].name : slot === 'ether' ? 'Ether' : 'Element'}.`;
+      };
+      return [s];
+    },
+    onChange: () => ['scene', 'ether', 'element'].forEach(renderSlot)
+  });
+}
+async function updateRefCount() {
+  const n = (await CharacterStore.allImages()).reduce((a, e) => a + e.images.length, 0);
+  $('myrefs-count').textContent = n ? `· ${n}` : '';
+}
+$('myrefs').addEventListener('toggle', () => { if ($('myrefs').open) mountRefGallery(); });
+updateRefCount();
 
 const locationParams = new URLSearchParams(window.location.search);
 if (locationParams.has('char')) {

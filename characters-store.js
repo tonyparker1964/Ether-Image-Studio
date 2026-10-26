@@ -72,6 +72,26 @@ const CharacterStore = (() => {
     });
   }
   const getImages = id => tx('readonly', s => s.get(id)).then(v => Array.isArray(v) ? v : []).catch(() => []);
+  // Every saved reference, as [{key, images}], for the references gallery
+  async function allImages() {
+    try {
+      const d = await db();
+      return await new Promise((resolve, reject) => {
+        const s = d.transaction(STORE, 'readonly').objectStore(STORE), out = [];
+        const req = s.openCursor();
+        req.onsuccess = () => { const c = req.result; if (!c) return resolve(out); if (Array.isArray(c.value) && c.value.length) out.push({key: String(c.key), images: c.value}); c.continue(); };
+        req.onerror = () => reject(req.error);
+      });
+    } catch (e) { return []; }
+  }
+  // Remove one image from a key, keeping a saved character's count and avatar in sync
+  async function removeImage(key, index) {
+    const imgs = await getImages(key); imgs.splice(index, 1);
+    if (imgs.length) await setImages(key, imgs); else await deleteImages(key);
+    const c = get(key);
+    if (c) { try { upsert({...c, refs: imgs.length, thumb: index === 0 ? '' : c.thumb}); } catch (e) {} }
+    return imgs;
+  }
   const setImages = (id, images) => tx('readwrite', s => s.put(images, id));
   const deleteImages = id => tx('readwrite', s => s.delete(id)).catch(() => {});
 
@@ -92,5 +112,5 @@ const CharacterStore = (() => {
     });
   }
 
-  return {list, get, upsert, remove, newId, describe, getImages, setImages, shrink, heritageWords, KEY};
+  return {list, get, upsert, remove, newId, describe, getImages, setImages, allImages, removeImage, shrink, heritageWords, KEY};
 })();
